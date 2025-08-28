@@ -7,10 +7,10 @@ function App() {
 return (
 <BrowserRouter>
 <Routes>
-{/* <Route path="/signin" element={<Signin />} /> */}
-{/* <Route path="/signup" element={<Signup />} /> */}
-<Navbar/>
-<Route path="/" element={<signin />} />
+<Route path="/signin" element={<Signin />} />
+<Route path="/signup" element={<Signup />} />
+<Route path="/" element={<Navbar />} />
+
 <Route path="/footer" element={<Footer />} />
 
 {/* default redirect */}
