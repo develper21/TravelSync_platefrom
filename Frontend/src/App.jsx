@@ -3,6 +3,7 @@ import Signin from "./Pages/signin";
 import Signup from "./Pages/signup";
 import Navbar from "./components/navbar.jsx";
 import Footer from "./components/footer.jsx";
+import Homepage from "./Homepage/Homepage.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -10,7 +11,7 @@ function App() {
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Navbar />} />
-
+        <Route path="/homepage" element={<Homepage />} />
         <Route path="/footer" element={<Footer />} />
 
         {/* default redirect */}
