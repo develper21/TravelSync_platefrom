@@ -4,21 +4,20 @@ import Signup from "./Pages/signup";
 import Navbar from "./components/navbar.jsx";
 import Footer from "./components/footer.jsx";
 function App() {
-return (
-<BrowserRouter>
-<Routes>
-<Route path="/signin" element={<Signin />} />
-<Route path="/signup" element={<Signup />} />
-<Route path="/" element={<Navbar />} />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<Navbar />} />
 
-<Route path="/footer" element={<Footer />} />
+        <Route path="/footer" element={<Footer />} />
 
-{/* default redirect */}
-<Route path="*" element={<Navigate to="/" />} />
-</Routes>
-</BrowserRouter>
-);
+        {/* default redirect */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
 
 export default App;

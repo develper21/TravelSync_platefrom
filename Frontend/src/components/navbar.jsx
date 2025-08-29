@@ -54,7 +54,7 @@ import { useState } from "react";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navLinks = [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/home" },
     { name: "Explore", path: "/explore" },
     { name: "Bookings", path: "/bookings" },
     { name: "About", path: "/about" },
@@ -77,14 +77,7 @@ export default function Navbar() {
               <NavLink
                 key={link.name}
                 to={link.path}
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 ${
-                    isActive
-                      ? "text-blue-600"
-                      : "text-black hover:text-blue-600"
-                  }`
-                }
-              >
+                className="text-sm font-medium transition-colors duration-200 text-black hover:text-blue-600">
                 {link.name}
               </NavLink>
             ))}
