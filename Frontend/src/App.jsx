@@ -4,6 +4,7 @@ import Signup from "./Pages/signup";
 import Navbar from "./components/navbar.jsx";
 import Footer from "./components/footer.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
+import TripPlanner1 from "./Trip-Planner/step1.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -13,7 +14,7 @@ function App() {
         <Route path="/" element={<Navbar />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/footer" element={<Footer />} />
-
+        <Route path="/Trip-planer" element={<TripPlanner1 />} />
         {/* default redirect */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
