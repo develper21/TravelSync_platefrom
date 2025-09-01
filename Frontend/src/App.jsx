@@ -6,6 +6,9 @@ import Footer from "./components/footer.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
 import TripPlanner1 from "./Trip-Planner/step1.jsx";
 import TripPlanner2 from "./Trip-Planner/step2.jsx";
+import Bookings from "./Pages/bookings.jsx";
+import 
+
 function App() {
   return (
     <BrowserRouter>
