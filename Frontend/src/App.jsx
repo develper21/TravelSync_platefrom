@@ -6,6 +6,7 @@ import Footer from "./components/footer.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
 import TripPlanner1 from "./Trip-Planner/step1.jsx";
 import TripPlanner2 from "./Trip-Planner/step2.jsx";
+import About from "./About_us/about.jsx"
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +18,7 @@ function App() {
         <Route path="/footer" element={<Footer />} />
         <Route path="/Trip-planer1" element={<TripPlanner1 />} />
         <Route path="/trip-planer2" element={<TripPlanner2/>}/>
+        <Route path="/about" element={<About/>}/>
         {/* default redirect */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
