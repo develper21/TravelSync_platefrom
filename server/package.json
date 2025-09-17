@@ -1,0 +1,28 @@
+{
+  "name": "travelsync-backend",
+  "version": "1.0.0",
+  "description": "Backend for TravelSync application using Node.js, Express, MongoDB, Firebase Authentication, and Google Authenticator for OTP.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^13.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.1",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "author": "Dhruv Sonagra",
+  "license": "ISC"
+}
