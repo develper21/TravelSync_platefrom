@@ -14,7 +14,7 @@ const trips = [
     description:
       "Wandering through ancient ruins and savoring gelato at sunset. Unforgettable!",
     rating: 4,
-    image: romeImg, // manually add in public/images
+    image: romeImg, 
   },
   {
     id: 2,
