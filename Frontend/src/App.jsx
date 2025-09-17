@@ -5,6 +5,7 @@ import Homepage from "./Homepage/Homepage.jsx";
 import TripPlanner1 from "./Trip-Planner/step1.jsx";
 import TripPlanner2 from "./Trip-Planner/step2.jsx";
 import About from "./About_us/about.jsx"
+import Dashboard from "./Dashboard/dashboard.jsx";
 import ContactSection from "./Contact_us/contact.jsx";
 import Blog from "./Blog/blog.jsx";
 function App() {
@@ -13,14 +14,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/signin" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />       
-        
+        <Route path="/signup" element={<Signup />} />    
         <Route path="/homepage" element={<Homepage />} />       
         <Route path="/Trip-planer1" element={<TripPlanner1 />} />
         <Route path="/trip-planer2" element={<TripPlanner2/>}/>
         <Route path="/about" element={<About/>}/>
         <Route path="/contact" element={<ContactSection/>}/>
-        <Route path="/blog" element={<Blog/>}/>      
+        <Route path="/blog" element={<Blog/>}/>  
+        <Route path="/profile" element={<Dashboard/>}/>    
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
