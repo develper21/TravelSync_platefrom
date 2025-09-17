@@ -6,6 +6,7 @@ import TripPlanner1 from "./Trip-Planner/step1.jsx";
 import TripPlanner2 from "./Trip-Planner/step2.jsx";
 import About from "./About_us/about.jsx"
 import ContactSection from "./Contact_us/contact.jsx";
+import Blog from "./Blog/blog.jsx";
 function App() {
   return (
   
@@ -19,7 +20,7 @@ function App() {
         <Route path="/trip-planer2" element={<TripPlanner2/>}/>
         <Route path="/about" element={<About/>}/>
         <Route path="/contact" element={<ContactSection/>}/>
-              
+        <Route path="/blog" element={<Blog/>}/>      
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
