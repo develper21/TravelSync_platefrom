@@ -3,8 +3,7 @@ import { FaGlobe, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import Navbar from "../components/navbar.jsx";
-import Footer from "../components/footer.jsx";
+
 const cities = [
     "New York, USA",
     "London, UK",
@@ -52,7 +51,7 @@ export default function TripPlanner() {
 
     return (
         <>
-            <Navbar />
+           
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
                 {/* Heading */}
                 <div className="w-full max-w-6xl mb-10">
@@ -161,7 +160,7 @@ export default function TripPlanner() {
                     </div>
                 </div>
             </div>
-            <Footer />
+        
         </>
     );
 }

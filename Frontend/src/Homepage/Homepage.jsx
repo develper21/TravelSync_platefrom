@@ -1,6 +1,5 @@
 import React from "react";
-import Navbar from "../components/navbar";
-import Footer from "../components/footer";
+
 import { FaGlobe, FaStar } from "react-icons/fa";
 import { FaRoute, FaLeaf, FaHandHoldingHeart, FaHeadset } from "react-icons/fa";
 import { FaPlane, FaHotel, FaHiking } from "react-icons/fa";
@@ -128,7 +127,7 @@ const reviews = [
 const HeroSection = () => {
   return (
     <>
-      <Navbar />
+     
 
       {/* Hero Section */}
       <div
@@ -386,7 +385,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-      <Footer />
+    
     </>
   );
 };

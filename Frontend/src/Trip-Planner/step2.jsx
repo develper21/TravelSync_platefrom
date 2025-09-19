@@ -7,8 +7,7 @@ import {
   FaUsers,
   FaUtensils,
 } from "react-icons/fa";
-import Navbar from "../components/navbar";
-import Footer from "../components/footer";
+
 const experiences = [
   { id: 1, name: "Adventure", icon: <FaHiking size={28} />, color: "text-blue-500", bg: "bg-blue-100" },
   { id: 2, name: "Relaxation", icon: <FaLeaf size={28} />, color: "text-green-500", bg: "bg-green-100" },
@@ -31,7 +30,7 @@ export default function ExperienceStep() {
 
   return (
     <>
-    <Navbar/>
+   
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-4xl">
         {/* Heading */}
@@ -78,7 +77,7 @@ export default function ExperienceStep() {
         </div>
       </div>
     </div>
-    <Footer/>
+ 
     </>
   );
 }

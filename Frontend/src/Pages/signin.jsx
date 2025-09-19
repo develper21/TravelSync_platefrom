@@ -1,16 +1,30 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: replace with real auth logic
-    console.log("submit", { email, password });
-    alert("Submitted (check console)");
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Signin failed");
+        return;
+      }
+      if (data.token) localStorage.setItem("token", data.token);
+      navigate("/homepage");
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   function handleGoogleSignIn() {
@@ -19,8 +33,7 @@ export default function Signin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-6">
-      <div className="w-full max-w-6xl rounded-xl shadow-xl overflow-hidden md:grid md:grid-cols-2">
+      <div className="w-full h-100% rounded-xl shadow-xl overflow-hidden md:grid md:grid-cols-2">
         {/* LEFT - Illustration / promotional area (hidden on small screens) */}
         <div className="hidden md:flex relative items-center justify-center bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 p-10">
           {/* Decorative shapes */}
@@ -129,6 +142,5 @@ export default function Signin() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -8,6 +8,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   function validate() {
     if (!fullName.trim() || !email.trim() || !password) {
@@ -28,12 +29,27 @@ export default function SignupPage() {
     return true;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!validate()) return;
-    // TODO: replace with real sign-up logic (call API / NextAuth / backend)
-    console.log({ fullName, email });
-    alert("Account created (demo). Implement backend to complete signup.");
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Signup failed");
+        return;
+      }
+      // store token if provided (simple demo)
+      if (data.token) localStorage.setItem("token", data.token);
+      // navigate to homepage
+      navigate("/homepage");
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   function handleGoogleSignup() {
@@ -42,8 +58,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden bg-white md:flex md:h-[718px]">
+      <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white md:flex md:h-[718px]">
         {/* Left promotional panel */}
         <div className="hidden md:block md:w-1/2 bg-gradient-to-b from-blue-50 to-white p-8 relative">
           <div className="max-w-sm mx-auto mt-6">
@@ -153,6 +168,5 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
