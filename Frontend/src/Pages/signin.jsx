@@ -28,29 +28,28 @@ export default function Signin() {
   }
 
   function handleGoogleSignIn() {
-    // TODO: wire up your OAuth / NextAuth Google signin
     alert("Google Sign-in clicked (wire this up to your auth)");
   }
 
   return (
-      <div className="w-full h-100% rounded-xl shadow-xl overflow-hidden md:grid md:grid-cols-2">
+    <div className="min-h-screen w-full bg-white flex items-stretch">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 items-stretch">
         {/* LEFT - Illustration / promotional area (hidden on small screens) */}
-        <div className="hidden md:flex relative items-center justify-center bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 p-10">
-          {/* Decorative shapes */}
+        <div className="hidden md:flex relative items-center justify-center bg-gradient-to-r from-blue-400 via-gray-300 to-blue-100 p-10">
           <div className="absolute left-6 top-6 w-28 h-28 rounded-full bg-blue-100 opacity-80" />
           <div className="absolute right-6 bottom-6 w-20 h-20 rounded-xl bg-blue-50 opacity-70 transform rotate-6" />
 
-          <div className="w-full max-w-sm p-6 bg-transparent flex items-center justify-center">
+          <div className="w-full max-w-[460px] p-6 bg-transparent flex items-center justify-center">
             <img
               src="/img1.png"
               alt="Travel visual"
-              className="w-80 h-80 rounded-2xl object-cover shadow-lg"
+              className="max-w-[420px] w-full h-auto rounded-2xl object-cover shadow-lg"
             />
           </div>
         </div>
 
         {/* RIGHT - Form area */}
-        <div className="flex items-start justify-center bg-white p-8 md:p-12">
+        <div className="flex items-center justify-center bg-white p-6 md:p-12">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_20px_25px_rgba(0,0,0,0.10)] p-6 md:p-8">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-600" />
@@ -112,7 +111,6 @@ export default function Signin() {
               </button>
             </form>
 
-            {/* divider */}
             <div className="flex items-center my-6 gap-3">
               <div className="flex-1 h-px bg-gray-200" />
               <div className="text-gray-400 text-sm">OR</div>
@@ -124,7 +122,6 @@ export default function Signin() {
               className="w-full rounded-full bg-white border border-gray-200 py-3 flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
               aria-label="Sign in with Google"
             >
-              {/* simple Google-ish icon */}
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 9.2c0-.55-.05-1.08-.14-1.6H9v3.03h4.7c-.2 1.08-.83 1.98-1.78 2.6v2.15h2.88C16.45 14.6 17 12.96 17 9.2z" fill="#4285F4"/>
                 <path d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.88-2.15c-.8.54-1.83.86-3.08.86-2.37 0-4.37-1.6-5.09-3.76H1.02v2.36C2.52 15.98 5.54 18 9 18z" fill="#34A853"/>
@@ -142,5 +139,6 @@ export default function Signin() {
           </div>
         </div>
       </div>
+    </div>
   );
 }
