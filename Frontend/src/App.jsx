@@ -1,43 +1,141 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Signin from "./Pages/signin";
-import Signup from "./Pages/signup";
-import Homepage from "./Homepage/Homepage.jsx";
-import ProfilePage from "./profile/profilePage.jsx";
-import PaymentPage from "./payment/PaymentPage.jsx"
-import TripPlanner1 from "./Trip-Planner/step1.jsx";
-import TripPlanner2 from "./Trip-Planner/step2.jsx";
-import TripPlanner3 from "./Trip-Planner/step3.jsx";
-import TripPlanner5 from "./Trip-Planner/step5.jsx";
-import TripPlanner6 from "./Trip-Planner/step6.jsx";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import About from "./About/about.jsx";
-import ContactSection from "./Contact_us/contact.jsx";
-import Blog from "./Blog/blog.jsx";
+// Layout Components
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+
+// Context Providers
+import { AuthProvider } from './contexts/AuthContext';
+
+// Page Components
+import Home from './pages/public/Home';
+import About from './pages/public/About';
+import Contact from './pages/public/Contact';
+import Blog from './pages/public/Blog';
+
+// Auth Pages
+import SignIn from './pages/auth/SignIn';
+import SignUp from './pages/auth/SignUp';
+
+// Dashboard Pages
+import Profile from './pages/dashboard/Profile';
+import Payment from './pages/dashboard/Payment';
+
+// Trip Planning Pages
+import TripStep1 from './pages/trips/step1';
+import TripStep2 from './pages/trips/step2';
+import TripStep3 from './pages/trips/step3';
+import TripStep4 from './pages/trips/step4';
+import TripStep5 from './pages/trips/step5';
+import TripStep6 from './pages/trips/step6';
+
+// Booking Pages
+import Explore from './pages/bookings/Explore';
+
+// Common Components
+import ProtectedRoute from './components/common/ProtectedRoute';
+
 function App() {
   return (
-  
-    <BrowserRouter>
-      <Routes>
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/blog" element={<Blog />} />
 
-        <Route path="/about" element={<About/>}/>
-        <Route path="/homepage" element={<Homepage />} />
+            {/* Authentication Routes */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
 
-        <Route path="/tripPlanner1" element={<TripPlanner1 />} />
-        <Route path="/tripPlanner2" element={<TripPlanner2/>}/>
-        <Route path="/tripPlanner3" element={<TripPlanner3/>}/>
-        <Route path="/tripPlanner5" element={<TripPlanner5/>}/>
-        <Route path="/tripPlanner6" element={<TripPlanner6/>}/>
+            {/* Protected Routes */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/profile" element={<ProfilePage/>}/>
-        <Route path="/Payment" element={<PaymentPage/>}/>
-        
-        <Route path="/contact" element={<ContactSection/>}/>
-        <Route path="/blog" element={<Blog/>}/>      
-        <Route path="*" element={<Navigate to="/about" />} />
-      </Routes>
-    </BrowserRouter>
+            {/* Trip Planning Routes */}
+            <Route
+              path="/trip-planner-1"
+              element={
+                <ProtectedRoute>
+                  <TripStep1 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trip-planner-2"
+              element={
+                <ProtectedRoute>
+                  <TripStep2 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trip-planner-3"
+              element={
+                <ProtectedRoute>
+                  <TripStep3 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trip-planner-4"
+              element={
+                <ProtectedRoute>
+                  <TripStep4 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trip-planner-5"
+              element={
+                <ProtectedRoute>
+                  <TripStep5 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trip-planner-6"
+              element={
+                <ProtectedRoute>
+                  <TripStep6 />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Booking Routes */}
+            <Route
+              path="/explore"
+              element={
+                <ProtectedRoute>
+                  <Explore />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
