@@ -1,10 +1,20 @@
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json"; // place your service account JSON at this path
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // databaseURL: 'https://<your-database-name>.firebaseio.com' // optional
-});
+// Optional Firebase configuration
+let firebaseAuth = null;
 
-export const firebaseAuth = admin.auth();
+try {
+  // Try to import service account key (optional)
+  const serviceAccount = await import("./serviceAccountKey.json", { assert: { type: "json" } });
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount.default),
+  });
+  firebaseAuth = admin.auth();
+  console.log("✅ Firebase initialized successfully");
+} catch (error) {
+  console.log("⚠️ Firebase not configured - authentication will use local methods only");
+  console.log("To enable Firebase auth, add serviceAccountKey.json file");
+}
+
+export { firebaseAuth };
 export default admin;

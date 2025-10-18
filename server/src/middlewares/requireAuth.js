@@ -22,4 +22,5 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
+export { requireAuth };
 export default requireAuth;
