@@ -3,31 +3,25 @@ import User from "../models/User.js";
 import { firebaseAuth } from "../config/firebase.js";
 import { generateOTP, verifyOTPToken } from "../services/totpService.js";
 
-// Sign up a new user
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
 
   try {
-    // Create user in Firebase (admin SDK)
     const userRecord = await firebaseAuth.createUser({
       email,
       password,
     });
 
-    // Create user in MongoDB
     const newUser = new User({
       uid: userRecord.uid,
       fullName,
       email,
-      password, // NOTE: hash in production
+      password,
     });
 
     await newUser.save();
 
-    // generate TOTP secret and QR for user (optional)
     const { qrCode } = await generateOTP(newUser);
-
-    // create JWT
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -38,12 +32,10 @@ export const signup = async (req, res) => {
   }
 };
 
-// Sign in an existing user
 export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user in MongoDB and verify password (demo: plaintext)
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -59,7 +51,6 @@ export const signin = async (req, res) => {
   }
 };
 
-// Verify OTP
 export const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 
