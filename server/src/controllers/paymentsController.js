@@ -1,6 +1,5 @@
 import Payment from '../models/Payment.js';
 
-// Get all payments for a user
 export const getUserPayments = async (req, res) => {
   try {
     const payments = await Payment.find({ userId: req.user.id })
@@ -13,7 +12,6 @@ export const getUserPayments = async (req, res) => {
   }
 };
 
-// Get a specific payment
 export const getPayment = async (req, res) => {
   try {
     const payment = await Payment.findOne({
@@ -32,7 +30,6 @@ export const getPayment = async (req, res) => {
   }
 };
 
-// Create a new payment
 export const createPayment = async (req, res) => {
   try {
     const paymentData = {
@@ -43,7 +40,6 @@ export const createPayment = async (req, res) => {
 
     const payment = new Payment(paymentData);
 
-    // Simulate payment processing
     setTimeout(async () => {
       try {
         payment.status = 'completed';
@@ -61,7 +57,6 @@ export const createPayment = async (req, res) => {
   }
 };
 
-// Process payment (webhook simulation)
 export const processPayment = async (req, res) => {
   try {
     const { paymentId, status } = req.body;
@@ -82,7 +77,6 @@ export const processPayment = async (req, res) => {
   }
 };
 
-// Get payment statistics
 export const getPaymentStats = async (req, res) => {
   try {
     const stats = await Payment.aggregate([
