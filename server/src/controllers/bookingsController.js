@@ -1,6 +1,5 @@
 import Booking from '../models/Booking.js';
 
-// Get all bookings for a user
 export const getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ userId: req.user.id })
@@ -12,7 +11,6 @@ export const getUserBookings = async (req, res) => {
   }
 };
 
-// Get a specific booking
 export const getBooking = async (req, res) => {
   try {
     const booking = await Booking.findOne({
@@ -30,7 +28,6 @@ export const getBooking = async (req, res) => {
   }
 };
 
-// Create a new booking
 export const createBooking = async (req, res) => {
   try {
     const bookingData = {
@@ -47,7 +44,6 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// Update a booking
 export const updateBooking = async (req, res) => {
   try {
     const booking = await Booking.findOneAndUpdate(
@@ -66,7 +62,6 @@ export const updateBooking = async (req, res) => {
   }
 };
 
-// Cancel a booking
 export const cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findOneAndUpdate(
@@ -85,7 +80,6 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-// Get booking statistics
 export const getBookingStats = async (req, res) => {
   try {
     const stats = await Booking.aggregate([
