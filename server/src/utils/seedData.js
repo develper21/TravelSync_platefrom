@@ -2,7 +2,6 @@ import Hotel from '../models/Hotel.js';
 
 export const seedHotels = async () => {
   try {
-    // Check if hotels already exist
     const existingHotels = await Hotel.countDocuments();
     if (existingHotels > 0) {
       console.log('Hotels already exist in database');
@@ -188,9 +187,9 @@ export const seedHotels = async () => {
     ];
 
     await Hotel.insertMany(hotels);
-    console.log('✅ Sample hotels seeded successfully!');
+    console.log('Sample hotels seeded successfully!');
   } catch (error) {
-    console.error('❌ Error seeding hotels:', error);
+    console.error('Error seeding hotels:', error);
   }
 };
 

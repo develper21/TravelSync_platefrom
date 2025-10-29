@@ -1,6 +1,5 @@
 import User from '../models/User.js';
 
-// Get user profile
 export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -10,7 +9,6 @@ export const getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
 export const updateProfile = async (req, res) => {
   try {
     const allowedUpdates = ['fullName', 'email', 'phone', 'preferences'];
@@ -38,7 +36,6 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// Delete user account
 export const deleteAccount = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.user.id);
@@ -53,7 +50,6 @@ export const deleteAccount = async (req, res) => {
   }
 };
 
-// Get user preferences
 export const getPreferences = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('preferences');
@@ -63,7 +59,6 @@ export const getPreferences = async (req, res) => {
   }
 };
 
-// Update user preferences
 export const updatePreferences = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(

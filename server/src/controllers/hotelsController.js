@@ -1,6 +1,5 @@
 import Hotel from '../models/Hotel.js';
 
-// Get all hotels with optional filtering
 export const getHotels = async (req, res) => {
   try {
     const {
@@ -41,7 +40,6 @@ export const getHotels = async (req, res) => {
   }
 };
 
-// Get a specific hotel
 export const getHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findById(req.params.id);
@@ -56,7 +54,6 @@ export const getHotel = async (req, res) => {
   }
 };
 
-// Search hotels
 export const searchHotels = async (req, res) => {
   try {
     const { q, city, country } = req.query;
@@ -84,7 +81,6 @@ export const searchHotels = async (req, res) => {
   }
 };
 
-// Get eco-friendly hotels
 export const getEcoFriendlyHotels = async (req, res) => {
   try {
     const { limit = 10 } = req.query;
@@ -99,7 +95,6 @@ export const getEcoFriendlyHotels = async (req, res) => {
   }
 };
 
-// Create a new hotel (admin only)
 export const createHotel = async (req, res) => {
   try {
     const hotel = new Hotel(req.body);
@@ -111,7 +106,6 @@ export const createHotel = async (req, res) => {
   }
 };
 
-// Update a hotel (admin only)
 export const updateHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findByIdAndUpdate(
@@ -130,7 +124,6 @@ export const updateHotel = async (req, res) => {
   }
 };
 
-// Delete a hotel (admin only)
 export const deleteHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findByIdAndDelete(req.params.id);
