@@ -3,7 +3,7 @@ import admin from "firebase-admin";
 let firebaseAuth = null;
 
 try {
-  const serviceAccount = await import("./serviceAccountKey.json", { assert: { type: "json" } });
+  const serviceAccount = await import("../services/serviceAccountKey.json", { with: { type: "json" } });
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount.default),
   });
