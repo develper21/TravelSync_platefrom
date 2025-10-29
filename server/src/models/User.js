@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
   },
   otpSecret: {
     type: String,
-    // made optional so signup flow can generate & set after save
   },
   createdAt: {
     type: Date,

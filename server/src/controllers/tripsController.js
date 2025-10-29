@@ -1,6 +1,5 @@
 import Trip from '../models/Trip.js';
 
-// Get all trips for a user
 export const getUserTrips = async (req, res) => {
   try {
     const trips = await Trip.find({ userId: req.user.id }).sort({ createdAt: -1 });
@@ -10,7 +9,6 @@ export const getUserTrips = async (req, res) => {
   }
 };
 
-// Get a specific trip
 export const getTrip = async (req, res) => {
   try {
     const trip = await Trip.findOne({
@@ -28,7 +26,6 @@ export const getTrip = async (req, res) => {
   }
 };
 
-// Create a new trip
 export const createTrip = async (req, res) => {
   try {
     const tripData = {
@@ -45,7 +42,6 @@ export const createTrip = async (req, res) => {
   }
 };
 
-// Update a trip
 export const updateTrip = async (req, res) => {
   try {
     const trip = await Trip.findOneAndUpdate(
@@ -64,7 +60,6 @@ export const updateTrip = async (req, res) => {
   }
 };
 
-// Delete a trip
 export const deleteTrip = async (req, res) => {
   try {
     const trip = await Trip.findOneAndDelete({
@@ -82,7 +77,6 @@ export const deleteTrip = async (req, res) => {
   }
 };
 
-// Get trip statistics
 export const getTripStats = async (req, res) => {
   try {
     const stats = await Trip.aggregate([

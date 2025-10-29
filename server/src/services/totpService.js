@@ -3,7 +3,7 @@ import qrcode from 'qrcode';
 
 export const generateOTP = async (user) => {
   const secret = authenticator.generateSecret();
-  user.otpSecret = secret; // Save this secret to the user in the database field otpSecret
+  user.otpSecret = secret;
   await user.save();
 
   const otpauth = authenticator.keyuri(user.email, 'TravelSync', secret);

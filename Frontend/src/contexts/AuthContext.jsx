@@ -17,24 +17,20 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is authenticated on app start
     const token = localStorage.getItem('token');
     if (token) {
-      // For now, just set a mock user - in real app, verify token with backend
       setUser({ email: 'user@example.com', name: 'User' });
     }
     setLoading(false);
   }, []);
 
   const signin = async (credentials) => {
-    // Mock signin - replace with actual API call
     localStorage.setItem('token', 'mock-jwt-token');
     setUser({ email: credentials.email, name: 'User' });
     return { user: { email: credentials.email, name: 'User' }, token: 'mock-jwt-token' };
   };
 
   const signup = async (userData) => {
-    // Mock signup - replace with actual API call
     localStorage.setItem('token', 'mock-jwt-token');
     setUser({ email: userData.email, name: userData.firstName });
     return { user: { email: userData.email, name: userData.firstName }, token: 'mock-jwt-token' };
