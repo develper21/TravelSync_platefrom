@@ -1,152 +1,217 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaPlane, FaHotel, FaMapMarkerAlt, FaLeaf, FaUsers, FaStar } from 'react-icons/fa';
-import Button from '../../components/ui/Button';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
+import Button from '../../components/ui/Button';
 
-const Home = () => {
+const PLACEHOLDER = '../../../public/Homepage.png';
+
+const DestinationCard = ({ img = PLACEHOLDER, title, rating, desc }) => (
+  <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+    <img src={img} alt={title} className="w-full h-64 object-cover" />
+    <div className="p-5 flex-1 flex flex-col">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <div className="flex items-center text-orange-500 text-sm">
+          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.96a1 1 0 00.95.69h4.163c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.96c.3.921-.755 1.688-1.54 1.118L10 15.347l-3.371 2.449c-.784.57-1.838-.197-1.539-1.118l1.286-3.96a1 1 0 00-.364-1.118L2.641 9.387c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.286-3.96z"/></svg>
+          <strong>{rating}</strong>
+        </div>
+      </div>
+      <p className="text-sm text-slate-600 mb-4">{desc}</p>
+      <div className="mt-auto">
+        <button className="w-full py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition">
+          View More
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+const FeatureCard = ({ icon, title, desc }) => (
+  <div className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition">
+    <div className="flex justify-center mb-4">{icon}</div>
+    <h4 className="text-lg font-semibold mb-2 text-slate-900">{title}</h4>
+    <p className="text-sm text-slate-600">{desc}</p>
+  </div>
+);
+
+const Testimonial = ({ avatar = PLACEHOLDER, name, location, text }) => (
+  <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
+    <img src={avatar} alt={name} className="w-16 h-16 rounded-full object-cover mb-4" />
+    <div className="font-semibold">{name} <span className="text-sm text-slate-400">/ {location}</span></div>
+    <p className="text-sm text-slate-600 mt-3">{text}</p>
+  </div>
+);
+
+const Homepage = () => {
   const features = [
     {
-      icon: <FaPlane className="text-3xl text-blue-600" />,
-      title: 'Smart Trip Planning',
-      description: 'AI-powered itineraries tailored to your preferences and budget.',
+      icon: <div className="text-3xl">✈️</div>,
+      title: 'Smart Trip Planner',
+      desc: 'Personalized itineraries using AI & local insights.'
     },
     {
-      icon: <FaHotel className="text-3xl text-green-600" />,
+      icon: <div className="text-3xl">🏨</div>,
       title: 'Eco-Friendly Hotels',
-      description: 'Handpicked sustainable accommodations that care for the environment.',
+      desc: 'Curated stays that care for the planet.'
     },
     {
-      icon: <FaMapMarkerAlt className="text-3xl text-orange-600" />,
+      icon: <div className="text-3xl">📍</div>,
       title: 'Local Experiences',
-      description: 'Connect with authentic local guides and cultural experiences.',
+      desc: 'Connect with authentic adventures and culture.'
     },
     {
-      icon: <FaLeaf className="text-3xl text-green-600" />,
-      title: 'Sustainable Travel',
-      description: 'Carbon-neutral trips that support local communities.',
-    },
+      icon: <div className="text-3xl">📞</div>,
+      title: '24/7 Support',
+      desc: "We're here whenever you need us, day or night."
+    }
   ];
 
-  const stats = [
-    { number: '1,323+', label: 'Trips Planned', icon: <FaPlane /> },
-    { number: '1,363+', label: 'Eco-Stays Booked', icon: <FaHotel /> },
-    { number: '1,381+', label: 'Local Guides', icon: <FaUsers /> },
-    { number: '4.9/5', label: 'Customer Rating', icon: <FaStar /> },
+  const destinations = [
+    { title: 'Santorini, Greece', rating: '4.8', desc: 'Stunning white-washed villages perched above crystal blue seas.' },
+    { title: 'Kyoto, Japan', rating: '4.9', desc: 'Experience timeless temples and blooming cherry blossoms.' },
+    { title: 'Banff, Canada', rating: '4.7', desc: 'Majestic mountains and emerald lakes in a dreamlike landscape.' },
+    { title: 'Marrakech, Morocco', rating: '4.6', desc: 'Vivid souks, spicy aromas, and vibrant ancient streets.' },
+    { title: 'Reykjavik, Iceland', rating: '4.8', desc: 'Chase the Northern Lights and soak in geothermal lagoons.' },
+    { title: 'Cape Town, S. Africa', rating: '4.7', desc: 'A coastal city with iconic mountains and rich culture.' }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       <Header />
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-green-600/90"></div>
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Your Journey to
-            <span className="block text-yellow-300">Sustainable Travel</span>
-          </h1>
-          <p className="text-lg md:text-xl mb-8 opacity-90">
-            Discover amazing destinations, plan eco-friendly trips, and create unforgettable memories
-            with our AI-powered travel platform.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/trip-planner-1">
-              <Button size="lg" className="w-full sm:w-auto">
-                Start Planning
-              </Button>
-            </Link>
-            <Link to="/explore">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                Explore Destinations
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose TravelSync?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We combine technology with sustainability to provide you with the best travel experience possible.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center p-6 rounded-xl hover:shadow-lg transition-shadow">
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center text-white">
-                <div className="flex justify-center mb-2">
-                  <div className="text-2xl">
-                    {stat.icon}
+      <section className="relative overflow-hidden">
+        <div
+          className="h-[760px] sm:h-[700px] w-full bg-cover bg-center"
+          style={{ backgroundImage: "url('../../../public/Homepage.png')" }}>
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(60,130,246,0.8), rgba(60,130,246,0.4) 50%, rgba(0,0,0,0))' }} />
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-[760px] sm:h-[520px] flex items-center">
+            <div className="w-full md:w-2/3 lg:w-1/2 text-center">
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight" style={{ color: '#ffffff' }}>
+                Explore the World Smarter with <span style={{ color: '#22c55e' }}> TravelSync</span>
+              </h1>
+              <p className="mt-4 text-sm md:text-base text-white/90 max-w-md">
+                Discover, plan, and book eco-friendly trips with ease. Your adventure starts here.
+              </p>
+              <div className="mt-6">
+                <div className="bg-white/95 shadow-lg rounded-xl p-4 w-full max-w-3xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm font-medium text-slate-700">Destination</label>
+                      <input className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Where to?" />
+                    </div>
+                    <div className="w-full sm:w-48">
+                      <label className="block text-sm font-medium text-slate-700">Date</label>
+                      <input type="date" className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    </div>
+                    <div className="w-full sm:w-40">
+                      <label className="block text-sm font-medium text-slate-700">Type</label>
+                      <select className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                        <option>Hotel</option>
+                        <option>Flight + Hotel</option>
+                        <option>Experiences</option>
+                      </select>
+                    </div>
+                    <div className="w-full sm:w-48">
+                      <label className="block text-sm font-medium text-transparent">button</label>
+                      <button className="mt-2 w-full rounded-lg bg-blue-500 hover:bg-blue-600 text-white py-2 font-semibold flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                        Plan My Trip
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="text-3xl md:text-4xl font-bold mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-blue-100">
-                  {stat.label}
-                </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-center mb-8">Popular Destinations</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {destinations.map((d, i) => (
+            <DestinationCard key={i} img={`/images/dest-${i+1}.jpg`} {...d} />
+          ))}
+        </div>
+      </section>
+      <section className="py-12 bg-gradient-to-r from-slate-50 to-green-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="text-2xl font-bold text-center mb-6">Why TravelSync?</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((f, idx) => (
+              <FeatureCard
+                key={idx}
+                icon={<div className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow text-2xl">{f.icon}</div>}
+                title={f.title}
+                desc={f.desc}
+              />
             ))}
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Join thousands of travelers who trust TravelSync for their sustainable travel needs.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/signup">
-              <Button size="lg">
-                Create Account
-              </Button>
-            </Link>
-            <Link to="/about">
-              <Button variant="outline" size="lg">
-                Learn More
-              </Button>
-            </Link>
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div>
+            <div className="bg-slate-50 rounded-xl shadow-lg p-6">
+              <h4 className="text-lg font-semibold mb-4">Sample Itinerary</h4>
+              <div className="space-y-4 text-slate-700">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-white shadow flex items-center justify-center">✈️</div>
+                  <div>
+                    <div className="font-medium">Travel</div>
+                    <div className="text-sm text-slate-500">Flight to Kyoto, Japan – 09:30 AM</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-white shadow flex items-center justify-center">🏨</div>
+                  <div>
+                    <div className="font-medium">Stay</div>
+                    <div className="text-sm text-slate-500">Eco-Friendly Ryokan – 2 Nights</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-white shadow flex items-center justify-center">🎎</div>
+                  <div>
+                    <div className="font-medium">Activities</div>
+                    <div className="text-sm text-slate-500">Guided Cherry Blossom Tour, Tea Ceremony</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-xl font-semibold text-slate-900 mb-3">Your journey, visualized</h4>
+            <p className="text-slate-600 mb-6">TravelSync's itinerary builder lets you preview your entire trip at a glance—flights, stays, and experiences, all in one place.</p>
+            <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white">
+              Try Itinerary Builder
+            </Button>
           </div>
         </div>
       </section>
-
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="text-2xl font-bold text-center mb-6">What Our Travelers Say</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Testimonial name="Alex Kim" location="Seoul" text={`"TravelSync's planner made my Japan trip effortless! Loved the eco-hotel suggestions."`} />
+            <Testimonial name="Maria Lopez" location="Barcelona" text={`"The local guides and unique experiences were unforgettable. Highly recommended!"`} />
+            <Testimonial name="Ethan Hall" location="London" text={`"24/7 support helped me when my flight got delayed. Fantastic service!"`} />
+          </div>
+        </div>
+      </section>
+      <section className="py-12 bg-gradient-to-r from-[#3c82f6] to-[#22c55e] h-100">
+        <div className="relative">
+          <div className="max-w-3xl mx-auto px-4">
+            <div className="bg-white/90 backdrop-blur-md p-8 rounded-xl shadow-2xl">
+              <h4 className="text-2xl font-bold mb-2">Get the Best Travel Tips</h4>
+              <p className="text-slate-600 mb-6">Sign up for our newsletter to receive exclusive tips, destination guides, and special offers straight to your inbox.</p>
+              <form className="flex flex-col sm:flex-row gap-3">
+                <input className="flex-1 rounded-lg border border-slate-200 px-4 py-2" placeholder="Enter your email..." />
+                <button type="submit" className="rounded-lg bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 font-semibold">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
       <Footer />
     </div>
   );
 };
 
-export default Home;
+export default Homepage;
