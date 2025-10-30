@@ -14,6 +14,7 @@ const Header = () => {
     { name: 'Home', path: '/', requiresAuth: false },
     { name: 'About', path: '/about', requiresAuth: false },
     { name: 'Explore', path: '/explore', requiresAuth: false },
+    { name: 'Contact', path: '/contact', requiresAuth: false },
     { name: 'Trips', path: '/trips', requiresAuth: true },
     { name: 'Bookings', path: '/bookings', requiresAuth: true },
     { name: 'Profile', path: '/profile', requiresAuth: true },
