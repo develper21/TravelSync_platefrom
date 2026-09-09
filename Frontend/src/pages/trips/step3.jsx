@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaStar,
   FaLeaf,
@@ -6,9 +6,11 @@ import {
   FaChevronRight,
   FaChevronLeft,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import { MdSupportAgent } from "react-icons/md";
+import api from "../../services/api";
 
 import hotel1 from "../../assets/images/hotel1.png";
 import hotel2 from "../../assets/images/hotel2.png";
@@ -75,12 +77,50 @@ export default function TripPlanner3() {
   const [filterPrice, setFilterPrice] = useState("");
   const [ecoOnly, setEcoOnly] = useState(false);
   const [sortBy, setSortBy] = useState("price");
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [hotelsList, setHotelsList] = useState(HOTELS);
+  const navigate = useNavigate();
 
-  const visibleHotels = HOTELS.filter((h) => {
+  useEffect(() => {
+    api.get('/hotels')
+      .then(res => {
+        if (res.data?.hotels && res.data.hotels.length > 0) {
+          const mapped = res.data.hotels.map((h, i) => ({
+            id: h._id,
+            name: h.name,
+            badges: h.ecoFriendly ? ["Eco-Friendly"] : ["Standard"],
+            rating: h.rating || 4.5,
+            price: `$${h.price?.min || 150}– $${h.price?.max || 350}`,
+            img: h.images?.[0] || [hotel1, hotel2, hotel3, hotel4, hotel5, hotel6][i % 6]
+          }));
+          setHotelsList(mapped);
+        }
+      })
+      .catch(err => console.warn('Could not load hotels from API:', err));
+  }, []);
+
+  const handleSelectHotel = (hotel) => {
+    setSelectedHotel(hotel);
+  };
+
+  const handleNext = () => {
+    if (!selectedHotel) {
+      alert("Please select a hotel to continue.");
+      return;
+    }
+    localStorage.setItem('tripHotel', JSON.stringify(selectedHotel));
+    navigate('/trip-planner-4');
+  };
+
+  const handleBack = () => {
+    navigate('/trip-planner-2');
+  };
+
+  const visibleHotels = hotelsList.filter((h) => {
     if (ecoOnly && !h.badges.includes("Eco-Friendly")) return false;
     if (filterRating && Number(h.rating) < Number(filterRating)) return false;
     if (filterPrice) {
-      const low = Number(h.price.replace(/[^0-9–\- ]/g, "").split(/[–\-]/)[0]);
+      const low = Number(h.price.replace(/[^0-9]/g, "").slice(0, 3));
       if (filterPrice === "low" && low > 100) return false;
       if (filterPrice === "med" && (low < 80 || low > 200)) return false;
       if (filterPrice === "high" && low < 200) return false;
@@ -88,8 +128,8 @@ export default function TripPlanner3() {
     return true;
   }).sort((a, b) => {
     if (sortBy === "price") {
-      const aLow = Number(a.price.replace(/[^0-9–\- ]/g, "").split(/[–\-]/)[0]);
-      const bLow = Number(b.price.replace(/[^0-9–\- ]/g, "").split(/[–\-]/)[0]);
+      const aLow = Number(a.price.replace(/[^0-9]/g, "").slice(0, 3));
+      const bLow = Number(b.price.replace(/[^0-9]/g, "").slice(0, 3));
       return aLow - bLow;
     } else {
       return b.rating - a.rating;
@@ -107,7 +147,6 @@ export default function TripPlanner3() {
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
                   <FaLeaf className="text-green-500 text-2xl" />
                 </div>
-                <img src={heroPlaceholder} alt="" className="hidden" />
               </div>
               <div>
                 <h2 className="text-xl sm:text-2xl font-semibold">
@@ -128,7 +167,6 @@ export default function TripPlanner3() {
                 value={filterRating}
                 onChange={(e) => setFilterRating(e.target.value)}
                 className="rounded-md border px-3 py-2 text-sm bg-white"
-                aria-label="Filter by rating"
               >
                 <option value="">Any rating</option>
                 <option value="4">4+ stars</option>
@@ -139,7 +177,6 @@ export default function TripPlanner3() {
                 value={filterPrice}
                 onChange={(e) => setFilterPrice(e.target.value)}
                 className="rounded-md border px-3 py-2 text-sm bg-white"
-                aria-label="Filter by price"
               >
                 <option value="">Any price</option>
                 <option value="low">Low</option>
@@ -166,19 +203,17 @@ export default function TripPlanner3() {
               </div>
               <button
                 onClick={() => setSortBy("price")}
-                className={`px-3 py-2 rounded-md text-sm border ${
-                  sortBy === "price" ? "bg-blue-50 border-blue-200" : "bg-white"
-                }`}
+                className={`px-3 py-2 rounded-md text-sm border ${sortBy === "price" ? "bg-blue-50 border-blue-200" : "bg-white"
+                  }`}
               >
                 Price
               </button>
               <button
                 onClick={() => setSortBy("rating")}
-                className={`px-3 py-2 rounded-md text-sm border ${
-                  sortBy === "rating"
+                className={`px-3 py-2 rounded-md text-sm border ${sortBy === "rating"
                     ? "bg-blue-50 border-blue-200"
                     : "bg-white"
-                }`}
+                  }`}
               >
                 Rating
               </button>
@@ -189,7 +224,8 @@ export default function TripPlanner3() {
             {visibleHotels.map((hotel) => (
               <article
                 key={hotel.id}
-                className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col"
+                className={`bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border-2 transition-all ${selectedHotel?.id === hotel.id ? "border-blue-500 ring-2 ring-blue-100" : "border-transparent"
+                  }`}
               >
                 <div className="h-40 sm:h-44 w-full bg-gray-100">
                   <img
@@ -212,13 +248,12 @@ export default function TripPlanner3() {
                     {hotel.badges.map((b, i) => (
                       <span
                         key={i}
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          b.includes("Eco")
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${b.includes("Eco")
                             ? "bg-green-50 text-green-700"
                             : b.includes("Luxury")
-                            ? "bg-blue-50 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
+                              ? "bg-blue-50 text-blue-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
                       >
                         {b}
                       </span>
@@ -233,17 +268,11 @@ export default function TripPlanner3() {
                       <div className="text-xs text-gray-500">/night</div>
                     </div>
 
-                    <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium shadow">
-                      Select
-                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
-                        <path
-                          d="M7 5l5 5-5 5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                    <button
+                      onClick={() => handleSelectHotel(hotel)}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow transition ${selectedHotel?.id === hotel.id ? "bg-green-600 text-white" : "bg-blue-600 text-white"
+                        }`}>
+                      {selectedHotel?.id === hotel.id ? "Selected" : "Select"}
                     </button>
                   </div>
                 </div>
@@ -251,28 +280,29 @@ export default function TripPlanner3() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-4 gap-4">
+          <div className="flex items-center justify-between mt-4 gap-4 bg-white p-4 rounded-xl shadow-sm border">
             <div className="flex items-center gap-3">
-              <button className="px-4 py-2 rounded-md border flex items-center gap-2">
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 rounded-md border flex items-center gap-2 hover:bg-gray-50">
                 <FaChevronLeft />
                 Back
-              </button>
-              <button className="text-sm text-gray-500 underline">
-                Skip This Step
               </button>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-500">Step 3 of 5</div>
-              <div className="flex gap-2 items-center">
-                <span className="w-8 h-2 bg-gray-200 rounded-full" />
-                <span className="w-8 h-2 bg-blue-500 rounded-full" />
-                <span className="w-8 h-2 bg-gray-200 rounded-full" />
-                <span className="w-8 h-2 bg-gray-200 rounded-full" />
-                <span className="w-8 h-2 bg-gray-200 rounded-full" />
+              <div className="flex gap-1">
+                <span className="w-6 h-1.5 bg-blue-500 rounded-full" />
+                <span className="w-6 h-1.5 bg-blue-500 rounded-full" />
+                <span className="w-6 h-1.5 bg-blue-500 rounded-full" />
+                <span className="w-6 h-1.5 bg-gray-200 rounded-full" />
+                <span className="w-6 h-1.5 bg-gray-200 rounded-full" />
               </div>
 
-              <button className="px-4 py-2 rounded-md bg-blue-600 text-white flex items-center gap-2">
+              <button
+                onClick={handleNext}
+                className="px-6 py-2 rounded-md bg-blue-600 text-white font-semibold flex items-center gap-2 hover:bg-blue-700 shadow-md">
                 Next Step
                 <FaChevronRight />
               </button>
@@ -282,7 +312,7 @@ export default function TripPlanner3() {
 
         <aside className="lg:col-span-1">
           <div className="sticky top-20 space-y-6">
-            <div className="bg-white rounded-2xl p-5 shadow">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
                 <img
                   src={plannerAvatar}
@@ -290,61 +320,40 @@ export default function TripPlanner3() {
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div>
-                  <div className="text-sm font-semibold">Alex Murphy</div>
-                  <div className="text-xs text-gray-500">Travel Planner</div>
-                </div>
-                <div className="ml-auto text-xs text-gray-400 flex items-center gap-1">
-                  <MdSupportAgent /> Support
+                  <div className="text-sm font-semibold text-gray-900">Alex Murphy</div>
+                  <div className="text-xs text-gray-400 uppercase tracking-wider">Expert Guide</div>
                 </div>
               </div>
 
-              <hr className="my-4" />
+              <hr className="my-4 border-gray-50" />
 
-              <h4 className="text-sm text-gray-600">Your Trip Summary</h4>
-              <div className="mt-3 text-sm text-gray-700 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Destination:</span>
-                  <span>Kyoto, Japan</span>
+              <h4 className="text-sm font-bold text-gray-900 mb-3">Your Progress</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                  <span className="text-xs text-gray-500">Destination</span>
+                  <span className="text-xs font-semibold text-gray-900">Selected ✅</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Dates:</span>
-                  <span>12–18 Oct 2025</span>
+                <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                  <span className="text-xs text-gray-500">Experience</span>
+                  <span className="text-xs font-semibold text-gray-900">Selected ✅</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Experience:</span>
-                  <span>Culture &amp; Nature</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Stay:</span>
-                  <span className="text-blue-600 font-medium">
-                    Green Oasis Resort
-                  </span>
-                </div>
+                {selectedHotel && (
+                  <div className="flex justify-between items-center bg-blue-50 p-2 rounded-lg border border-blue-100">
+                    <span className="text-xs text-blue-600">Hotel</span>
+                    <span className="text-xs font-bold text-blue-700">{selectedHotel.name}</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <h4 className="text-sm font-semibold mb-3">Need help?</h4>
-              <p className="text-sm text-gray-600">
-                Our travel agents are available 24/7 to help you finalize your
-                booking.
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 shadow-lg text-white">
+              <h4 className="font-semibold mb-2">Exclusive Offer!</h4>
+              <p className="text-xs text-blue-100 leading-relaxed">
+                Book now and get a complimentary eco-tour in your destination. Limited time only!
               </p>
-              <button className="mt-4 w-full px-4 py-2 rounded-md bg-blue-600 text-white">
-                Contact Support
+              <button className="mt-4 w-full bg-white text-blue-600 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 transition">
+                Learn More
               </button>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 shadow text-sm">
-              <div className="font-semibold mb-2">Newsletter</div>
-              <div className="flex gap-2">
-                <input
-                  placeholder="Your email"
-                  className="flex-1 px-3 py-2 border rounded-md text-sm"
-                />
-                <button className="px-3 py-2 rounded-md bg-blue-600 text-white">
-                  Subscribe
-                </button>
-              </div>
             </div>
           </div>
         </aside>

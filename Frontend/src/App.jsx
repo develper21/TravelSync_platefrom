@@ -56,13 +56,12 @@ function App() {
 =======
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
 import { AuthProvider } from './contexts/AuthContext';
 import Home from './pages/public/Home';
 import About from './pages/public/About';
 import Contact from './pages/public/Contact';
 import Blog from './pages/public/Blog';
+import BlogDetail from './pages/public/BlogDetail';
 import SignIn from './pages/auth/SignIn';
 import SignUp from './pages/auth/SignUp';
 import Profile from './pages/dashboard/Profile';
@@ -74,6 +73,7 @@ import TripStep4 from './pages/trips/step4';
 import TripStep5 from './pages/trips/step5';
 import TripStep6 from './pages/trips/step6';
 import Explore from './pages/bookings/Explore';
+import DestinationDetail from './pages/bookings/DestinationDetail';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
@@ -82,17 +82,31 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen bg-gray-50">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<BlogDetail />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/destinations/:id" element={<DestinationDetail />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
+
+            {/* Protected Routes */}
             <Route
               path="/profile"
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bookings"
+              element={
+                <ProtectedRoute>
+                  <Navigate to="/profile?tab=bookings" replace />
                 </ProtectedRoute>
               }
             />
@@ -152,14 +166,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/explore"
-              element={
-                <ProtectedRoute>
-                  <Explore />
-                </ProtectedRoute>
-              }
-            />
+
+            {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

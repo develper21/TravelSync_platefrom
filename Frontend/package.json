@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
+    "axios": "^1.13.2",
     "leaflet": "^1.9.4",
 <<<<<<< HEAD
     "lucide-react": "^0.544.0",

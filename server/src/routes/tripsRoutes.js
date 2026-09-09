@@ -16,6 +16,7 @@ router.get('/', getUserTrips);
 router.get('/stats', getTripStats);
 router.get('/:id', getTrip);
 router.post('/', createTrip);
+router.post('/plan', createTrip); // PDF route POST /api/trip/plan
 router.put('/:id', updateTrip);
 router.delete('/:id', deleteTrip);
 

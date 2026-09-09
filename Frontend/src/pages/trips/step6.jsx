@@ -1,128 +1,119 @@
-import React from "react";
-import baliImg from "../../assets/images/bali.png";
-import parisImg from "../../assets/images/paris.png";
-import tokyoImg from "../../assets/images/tokyo.png";
+import React, { useState, useEffect } from "react";
+import { FaCheckCircle, FaArrowRight, FaPlaneDeparture, FaTicketAlt, FaCalendarAlt, FaUserFriends } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 
 export default function TripPlanner6() {
-  const bookings = [
-    {
-      id: 1,
-      image: baliImg,
-      place: "Bali, Indonesia",
-      status: "Upcoming",
-      dates: "16 Apr – 22 Apr 2025",
-      hotel: "Oceanic Resort",
-      tags: ["Beach", "Nature"],
-      price: "$1,220",
-    },
-    {
-      id: 2,
-      image: parisImg,
-      place: "Paris, France",
-      status: "Completed",
-      dates: "10 Jan – 15 Jan 2024",
-      hotel: "Eiffel Inn",
-      tags: ["Food", "Culture"],
-      price: "$1,060",
-    },
-    {
-      id: 3,
-      image: tokyoImg,
-      place: "Tokyo, Japan",
-      status: "Cancelled",
-      dates: "30 Mar – 6 Apr 2024",
-      hotel: "Sakura Stay",
-      tags: ["Sightseeing"],
-      price: "$890",
-    },
-  ];
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem('lastBooking') || 'null');
+    setBookingDetails(data);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <Navbar/>
+    <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col justify-between">
+      <Navbar />
 
-      {/* Page header */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">My Bookings</h1>
-          <p className="mt-2 text-gray-500">View and manage your upcoming and past trips</p>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center w-full">
+        <div className="flex justify-center mb-6">
+          <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-600 shadow-md animate-bounce">
+            <FaCheckCircle size={48} />
+          </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div className="flex gap-2">
-            <button className="px-4 py-2 rounded-full bg-blue-600 text-white font-medium">Upcoming</button>
-            <button className="px-4 py-2 rounded-full border border-blue-600 text-blue-600">Past</button>
-            <button className="px-4 py-2 rounded-full border text-gray-500">Cancelled</button>
-          </div>
+        <span className="text-xs font-black uppercase tracking-widest text-green-700 bg-green-100 px-4 py-1.5 rounded-full">
+          Booking Confirmed & Paid
+        </span>
 
-          <div className="w-full md:w-96">
-            <label htmlFor="search" className="sr-only">Search</label>
-            <div className="relative">
-              <input
-                id="search"
-                placeholder="Search by destination or date"
-                className="w-full border rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mt-4 mb-3">
+          Pack Your Bags! You're All Set.
+        </h1>
+        <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
+          Your sustainable vacation has been reserved. All vouchers and confirmations have been synced to your dashboard.
+        </p>
+
+        {/* Receipt Card */}
+        {bookingDetails && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 max-w-xl mx-auto mb-10 text-left">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
+              <div>
+                <span className="text-xs text-gray-400 uppercase font-bold">Booking Reference</span>
+                <p className="text-lg font-black text-blue-600 tracking-wider">
+                  {bookingDetails.bookingReference || 'TS-CONFIRMED'}
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-gray-400 uppercase font-bold">Total Paid</span>
+                <p className="text-xl font-black text-green-600">
+                  ₹{bookingDetails.amount?.toLocaleString() || '25,000'}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-sm text-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Destination:</span>
+                <span className="font-bold">{bookingDetails.destination}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Travel Dates:</span>
+                <span className="font-semibold">{bookingDetails.dates}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Party Size:</span>
+                <span className="font-semibold">{bookingDetails.travelers} Traveler(s)</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Payment Status:</span>
+                <span className="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase">
+                  Verified Paid
+                </span>
+              </div>
             </div>
           </div>
+        )}
+
+        {/* Next Action Banner */}
+        <div className="bg-blue-50 p-6 sm:p-8 rounded-3xl border border-blue-100 mb-12 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-2xl mx-auto">
+          <div className="flex items-center gap-4 text-left">
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
+              <FaPlaneDeparture size={22} />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-blue-600 uppercase tracking-widest">Dashboard Sync</div>
+              <div className="text-base font-bold text-gray-900">Manage trip & download receipt anytime</div>
+            </div>
+          </div>
+
+          <Link
+            to="/profile?tab=bookings"
+            className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex items-center gap-2 flex-shrink-0"
+          >
+            View Bookings <FaArrowRight />
+          </Link>
         </div>
 
-        {/* Bookings list */}
-        <div className="grid gap-6">
-          {bookings.map((b) => (
-            <article key={b.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
-              <div className="w-full md:w-56 h-44 md:h-auto bg-gray-100 flex-shrink-0">
-                <img src={b.image} alt={b.place} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-semibold">{b.place}</h3>
-                      <div className="mt-2 text-sm text-gray-500">{b.dates}</div>
-                      <div className="mt-2 text-sm text-gray-500">{b.hotel}</div>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        b.status === 'Upcoming' ? 'bg-blue-50 text-blue-700' : b.status === 'Completed' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                      }`}>{b.status}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex gap-2 flex-wrap">
-                    {b.tags.map((t) => (
-                      <span key={t} className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">{t}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="text-lg font-bold text-blue-600">{b.price}</div>
-                  <div className="flex gap-3">
-                    <button className="px-4 py-2 rounded-lg bg-blue-600 text-white">View Details</button>
-                    {b.status === 'Upcoming' && (
-                      <button className="px-4 py-2 rounded-lg border border-red-300 text-red-600">Cancel Booking</button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
+        {/* Action highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+          <div className="p-6 bg-white rounded-3xl shadow-sm border border-gray-100">
+            <h4 className="font-bold text-gray-900 mb-1">Check Email</h4>
+            <p className="text-xs text-gray-500">Hotel vouchers and itinerary check-in instructions sent.</p>
+          </div>
+          <div className="p-6 bg-white rounded-3xl shadow-sm border border-gray-100">
+            <h4 className="font-bold text-gray-900 mb-1">Explore More</h4>
+            <p className="text-xs text-gray-500">Save more dream spots to your travel wishlist.</p>
+          </div>
+          <div className="p-6 bg-white rounded-3xl shadow-sm border border-gray-100">
+            <h4 className="font-bold text-gray-900 mb-1">24/7 Concierge</h4>
+            <p className="text-xs text-gray-500">Need adjustments? Our support team is always available.</p>
+          </div>
         </div>
-
-        {/* Pagination / empty state area (optional) */}
-        <div className="mt-8 flex items-center justify-center text-sm text-gray-500">Showing {bookings.length} bookings</div>
       </main>
-      <Footer/>
+
+      <Footer />
     </div>
   );
 }
