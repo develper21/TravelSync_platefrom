@@ -2,26 +2,25 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Button from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  const isAuthenticated = localStorage.getItem('token');
+  const { user, logout, isAuthenticated } = useAuth();
 
   const navigationItems = [
     { name: 'Home', path: '/', requiresAuth: false },
-    { name: 'About', path: '/about', requiresAuth: false },
     { name: 'Explore', path: '/explore', requiresAuth: false },
+    { name: 'Blog', path: '/blog', requiresAuth: false },
+    { name: 'About', path: '/about', requiresAuth: false },
     { name: 'Contact', path: '/contact', requiresAuth: false },
-    { name: 'Trips', path: '/trips', requiresAuth: true },
-    { name: 'Bookings', path: '/bookings', requiresAuth: true },
-    { name: 'Profile', path: '/profile', requiresAuth: true },
+    { name: 'Dashboard', path: '/profile', requiresAuth: true },
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/');
   };
 
@@ -49,11 +48,10 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                  location.pathname === item.path
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${location.pathname === item.path
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -64,11 +62,11 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium text-gray-700">Hey, {user?.fullName || 'Traveler'}</span>
                 <Link to="/profile">
-                  <Button variant="ghost" size="sm">
-                    <FaUser className="mr-2" />
-                    Profile
-                  </Button>
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <FaUser size={14} />
+                  </div>
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   <FaSignOutAlt className="mr-2" />
@@ -107,11 +105,10 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`block px-3 py-2 text-base font-medium rounded-md ${
-                  location.pathname === item.path
+                className={`block px-3 py-2 text-base font-medium rounded-md ${location.pathname === item.path
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -121,6 +118,9 @@ const Header = () => {
             <div className="border-t border-gray-200 pt-4">
               {isAuthenticated ? (
                 <>
+                  <div className="px-3 py-2 text-sm font-bold text-gray-900 border-b mb-2">
+                    {user?.fullName}
+                  </div>
                   <Link
                     to="/profile"
                     className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600"
