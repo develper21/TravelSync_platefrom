@@ -14,6 +14,10 @@ const tripSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  destinationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Destination',
+  },
   startDate: {
     type: Date,
     required: true,
@@ -22,24 +26,43 @@ const tripSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  budget: {
-    type: Number,
-    required: true,
-  },
   travelers: {
     type: Number,
     required: true,
     default: 1,
   },
-  description: {
-    type: String,
+  budget: {
+    type: Number,
+    default: 0,
   },
+  estimatedCost: {
+    type: Number,
+    default: 0,
+  },
+  selectedHotel: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null,
+  },
+  selectedActivities: [{
+    type: mongoose.Schema.Types.Mixed,
+  }],
   activities: [{
     day: Number,
     activity: String,
     time: String,
     location: String,
+    price: Number,
   }],
+  itinerary: [{
+    day: Number,
+    title: String,
+    description: String,
+    activities: [String],
+  }],
+  notes: {
+    type: String,
+    default: '',
+  },
   status: {
     type: String,
     enum: ['planning', 'confirmed', 'completed', 'cancelled'],
