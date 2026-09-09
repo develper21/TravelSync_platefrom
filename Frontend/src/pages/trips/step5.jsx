@@ -1,238 +1,287 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaMapMarkerAlt,
   FaCalendarAlt,
   FaChevronLeft,
+  FaCheckCircle,
 } from "react-icons/fa";
-
-import cityImg from "../../assets/images/paris.svg";
-import hotelImg from "../../assets/images/hotel.png";
-import activity1 from "../../assets/images/louvre.svg";
-import activity2 from "../../assets/images/foodwalk.svg";
-import activity3 from "../../assets/images/seine.svg";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import Navbar from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 
 export default function TripPlanner5() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [notes, setNotes] = useState("");
+  const [tripData, setTripData] = useState(null);
+  const [experiences, setExperiences] = useState([]);
+  const [hotel, setHotel] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [agree, setAgree] = useState(false);
+  const navigate = useNavigate();
 
-  const trip = {
-    destination: "Paris, France",
-    region: "Europe",
-    dates: "12 Mar 2025 – 20 Mar 2025",
-    nightsText: "(8 days, 7 nights)",
-    departure: "Departure: 10:00 AM",
-    experiences: ["Adventure", "Culture", "Food"],
-    hotel: {
-      name: "GreenLeaf Hotel",
-      badges: ["Eco", "Boutique"],
-      guests: "2 guests · Deluxe Room",
-      price: "$1,120",
-      nights: "/ 7 nights",
-      img: hotelImg,
-    },
-    activities: [
-      { title: "Louvre Museum Guided Tour", duration: "3h", img: activity1 },
-      { title: "Parisian Food Walk", duration: "2h", img: activity2 },
-      { title: "Seine River Cycling", duration: "1.5h", img: activity3 },
-    ],
-  };
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem('tripData') || '{}');
+    const exp = JSON.parse(localStorage.getItem('tripExperiences') || '[]');
+    const hot = JSON.parse(localStorage.getItem('tripHotel') || 'null');
+    const act = JSON.parse(localStorage.getItem('tripActivities') || '[]');
 
-  function handleConfirm() {
+    setTripData(data);
+    setExperiences(exp);
+    setHotel(hot);
+    setActivities(act);
+  }, []);
+
+  // Compute realistic pricing
+  const nights = 7;
+  const hotelRate = hotel ? (parseInt(hotel.price.replace(/[^0-9]/g, "")) || 150) : 150;
+  const hotelTotal = hotelRate * nights;
+  const activitiesTotal = activities.reduce((sum, a) => sum + (Number(a.price) || 50), 0);
+  const subtotal = (hotelTotal + activitiesTotal) * (tripData?.travelers || 1);
+  const taxes = Math.round(subtotal * 0.12);
+  const grandTotal = subtotal + taxes;
+
+  async function handleConfirm() {
     if (!agree) return;
-    alert("Booking confirmed (demo). Replace with API call.");
+    setLoading(true);
+    try {
+      // 1. Create Trip Record
+      const tripPayload = {
+        title: `Adventure to ${tripData.destination}`,
+        destination: tripData.destination,
+        startDate: tripData.startDate || new Date(),
+        endDate: tripData.endDate || new Date(Date.now() + 7 * 86400000),
+        travelers: tripData.travelers || 1,
+        budget: grandTotal,
+        estimatedCost: grandTotal,
+        selectedHotel: hotel ? { name: hotel.name, price: hotel.price } : null,
+        selectedActivities: activities,
+        activities: activities.map(a => ({ activity: a.name, price: a.price })),
+        status: 'confirmed'
+      };
+
+      const tripRes = await api.post('/trips', tripPayload);
+      const createdTrip = tripRes.data;
+
+      // 2. Create Booking Record
+      const bookingPayload = {
+        tripId: createdTrip._id,
+        type: 'package',
+        title: `Vacation Package: ${tripData.destination}`,
+        location: tripData.destination,
+        price: grandTotal,
+        amount: grandTotal,
+        status: 'confirmed',
+        paymentStatus: 'Paid',
+        paymentMethod: 'Credit Card',
+        details: {
+          hotel: hotel?.name,
+          activitiesCount: activities.length,
+          travelers: tripData.travelers || 1
+        }
+      };
+
+      const bookingRes = await api.post('/bookings', bookingPayload);
+      const createdBooking = bookingRes.data;
+
+      // 3. Create Payment Receipt
+      await api.post('/payments', {
+        tripId: createdTrip._id,
+        bookingId: createdBooking._id,
+        amount: grandTotal,
+        status: 'completed'
+      });
+
+      // Save receipt in localStorage for confirmation screen
+      localStorage.setItem('lastBooking', JSON.stringify({
+        bookingReference: createdBooking.bookingReference,
+        destination: tripData.destination,
+        amount: grandTotal,
+        travelers: tripData.travelers || 1,
+        dates: `${new Date(tripData.startDate).toLocaleDateString()} - ${new Date(tripData.endDate).toLocaleDateString()}`
+      }));
+
+      // Clear draft wizard data
+      localStorage.removeItem('tripData');
+      localStorage.removeItem('tripExperiences');
+      localStorage.removeItem('tripHotel');
+      localStorage.removeItem('tripActivities');
+
+      navigate('/trip-planner-6'); // Success page
+    } catch (error) {
+      console.error('Booking failed:', error);
+      alert(error.response?.data?.error || "Failed to confirm booking. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!tripData || !tripData.destination) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-between">
+        <Navbar />
+        <div className="p-20 text-center">
+          <h2 className="text-2xl font-bold text-gray-800">No active trip found</h2>
+          <p className="text-gray-500 mt-2 mb-6">Please start from Step 1 to plan your vacation.</p>
+          <button
+            onClick={() => navigate('/trip-planner-1')}
+            className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl"
+          >
+            Start Planner
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <Navbar/>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div className="flex items-center gap-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${i <= 5 ? "bg-blue-600" : "bg-gray-200"}`}
-                  aria-hidden
-                />
-                {i < 5 && <div className="w-12 h-1 rounded-full bg-gray-200" />}
-              </div>
-            ))}
-          </div>
+    <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col justify-between">
+      <Navbar />
 
-          <div className="flex-1">
-            <div className="text-sm text-gray-500">Step 5 of 5</div>
-            <h1 className="text-xl md:text-2xl font-semibold mt-1">Review Your Trip Plan</h1>
-            <p className="text-sm text-gray-500 mt-1">Make sure everything looks perfect before you confirm!</p>
-          </div>
-
-          <div className="flex items-center gap-3 ml-auto">
-            <button className="px-3 py-2 rounded-md border flex items-center gap-2">
-              <FaChevronLeft /> Back to Activities
-            </button>
-          </div>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <div className="text-center mb-12">
+          <span className="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full">
+            Step 5 of 5
+          </span>
+          <h1 className="text-4xl font-black text-gray-900 mt-3 mb-2">Review & Confirm Your Journey</h1>
+          <p className="text-gray-500 text-base">Almost there! Review your itinerary details and confirm booking.</p>
         </div>
-      </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2 space-y-6">
-          <article className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="w-full sm:w-48 h-28 sm:h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                <img src={cityImg} alt={trip.destination} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <FaMapMarkerAlt className="text-blue-600" />
-                  {trip.destination}
-                </h2>
-                <div className="text-sm text-gray-500 mt-1 flex flex-col sm:flex-row sm:items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-gray-400" />
-                    <span className="font-medium">{trip.dates}</span>
-                    <span className="text-xs text-blue-600 ml-2">{trip.nightsText}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Destination Card */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+                    <FaMapMarkerAlt size={24} />
                   </div>
-                  <div className="text-sm text-gray-500 ml-0 sm:ml-4">{trip.departure}</div>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {trip.experiences.map((e) => (
-                    <span
-                      key={e}
-                      className={`px-3 py-1 text-sm rounded-full font-medium ${
-                        e === "Adventure" ? "bg-blue-50 text-blue-700" : e === "Culture" ? "bg-green-50 text-green-700" : "bg-orange-50 text-orange-700"
-                      }`}
-                    >
-                      {e}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex gap-4">
-              <div className="w-28 h-28 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                <img src={trip.hotel.img} alt={trip.hotel.name} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold">{trip.hotel.name}</h3>
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                      {trip.hotel.badges.map((b) => (
-                        <span key={b} className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 font-medium">
-                          {b}
+                    <h2 className="text-2xl font-bold text-gray-900">{tripData.destination}</h2>
+                    <p className="text-gray-500 text-sm">Selected Destination</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <div className="text-xs text-gray-400 font-bold uppercase mb-1">Dates</div>
+                    <div className="text-sm font-semibold flex items-center gap-2 text-gray-800">
+                      <FaCalendarAlt className="text-blue-500" />
+                      {new Date(tripData.startDate).toLocaleDateString()} - {new Date(tripData.endDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <div className="text-xs text-gray-400 font-bold uppercase mb-1">Travelers</div>
+                    <div className="text-sm font-semibold text-gray-800">{tripData.travelers} Persons</div>
+                  </div>
+                </div>
+
+                {experiences.length > 0 && (
+                  <div className="mt-6">
+                    <div className="text-xs text-gray-400 font-bold uppercase mb-2">Trip Vibes & Interests</div>
+                    <div className="flex flex-wrap gap-2">
+                      {experiences.map(e => (
+                        <span key={e} className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100">
+                          {e}
                         </span>
                       ))}
                     </div>
-                    <div className="text-sm text-gray-500 mt-2">{trip.hotel.guests}</div>
                   </div>
+                )}
+              </div>
+            </div>
 
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-blue-600">{trip.hotel.price}</div>
-                    <div className="text-xs text-gray-400">{trip.hotel.nights}</div>
-                    <button className="mt-3 px-3 py-2 rounded-md border text-sm">Change</button>
+            {/* Hotel Card */}
+            {hotel && (
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold mb-4 text-gray-900">Accommodation</h3>
+                <div className="flex gap-6 items-center">
+                  <img src={hotel.img || '/images/bali.png'} className="w-32 h-24 rounded-2xl object-cover" alt={hotel.name} />
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">{hotel.name}</h4>
+                    <p className="text-gray-500 text-sm">Eco-Friendly Verified Stay</p>
+                    <div className="text-blue-600 font-bold mt-1">{hotel.price} <span className="text-xs text-gray-400">/ night</span></div>
                   </div>
                 </div>
               </div>
-            </div>
-          </article>
+            )}
 
-          <article className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Selected Activities</h3>
-              <div className="text-sm text-gray-500">You can edit any item</div>
-            </div>
-
-            <ul className="mt-4 space-y-4">
-              {trip.activities.map((a, idx) => (
-                <li key={idx} className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img src={a.img} alt={a.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium">{a.title}</div>
-                      <div className="text-sm text-gray-500">{a.duration}</div>
+            {/* Activities Card */}
+            {activities.length > 0 && (
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold mb-4 text-gray-900">Curated Activities</h3>
+                <div className="space-y-3">
+                  {activities.map(a => (
+                    <div key={a.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                      <span className="font-medium text-gray-800">{a.name}</span>
+                      <span className="text-blue-600 font-bold">₹{a.price || 2500}</span>
                     </div>
-                    <div className="text-sm text-gray-400 mt-1">Guide & entry included</div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
-                  <div className="text-sm">
-                    <button className="text-blue-600 underline mr-3">Edit</button>
-                    <FaChevronLeft className="hidden" />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </article>
-        </section>
+          {/* Sidebar / Confirm */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-blue-50 sticky top-24">
+              <h3 className="text-xl font-bold mb-6 text-gray-900">Price Breakdown</h3>
 
-        <aside className="lg:col-span-1">
-          <div className="sticky top-24 space-y-4">
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Accommodation & Trips</span>
+                  <span className="font-bold text-gray-800">₹{subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Eco-Taxes & Platform Fees</span>
+                  <span className="font-bold text-gray-800">₹{taxes.toLocaleString()}</span>
+                </div>
+                <hr className="border-gray-100" />
+                <div className="flex justify-between text-lg items-baseline">
+                  <span className="font-bold text-gray-900">Total Due</span>
+                  <span className="text-2xl font-black text-green-600">₹{grandTotal.toLocaleString()}</span>
+                </div>
+              </div>
 
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <h4 className="text-sm font-semibold mb-3">Contact Details</h4>
-
-              <label className="block text-xs text-gray-500">Full Name *</label>
-              <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full mt-2 px-3 py-2 border rounded-md text-sm"
-                placeholder="Full name"
-              />
-
-              <label className="block text-xs text-gray-500 mt-3">Email *</label>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full mt-2 px-3 py-2 border rounded-md text-sm"
-                placeholder="you@company.com"
-                type="email"
-              />
-
-              <label className="block text-xs text-gray-500 mt-3">Phone (optional)</label>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full mt-2 px-3 py-2 border rounded-md text-sm"
-                placeholder="+1 555 555 555"
-                type="tel"
-              />
-
-              <label className="block text-xs text-gray-500 mt-3">Special Notes (optional)</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full mt-2 px-3 py-2 border rounded-md text-sm h-24 resize-none"
-                placeholder="Any dietary restrictions, accessibility needs, etc."
-              />
-
-              <label className="inline-flex items-center gap-2 mt-4 text-sm">
-                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="w-4 h-4" />
-                <span className="text-sm text-gray-600">I agree to the terms and conditions</span>
-              </label>
+              <div className="mb-6">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={agree}
+                    onChange={e => setAgree(e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-xs text-gray-600 leading-snug">
+                    I agree to the <span className="text-blue-600 font-bold underline">Terms of Service</span> and authorize booking payment.
+                  </span>
+                </label>
+              </div>
 
               <button
                 onClick={handleConfirm}
-                disabled={!agree}
-                className={`mt-4 w-full px-4 py-3 rounded-lg font-semibold ${agree ? "bg-blue-600 text-white shadow" : "bg-gray-300 text-gray-600 cursor-not-allowed"}`}
+                disabled={!agree || loading}
+                className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
+                  agree && !loading
+                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                Confirm & Book Trip
+                {loading ? "Confirming & Reserving..." : "Confirm & Pay"}
+                {!loading && <FaCheckCircle />}
+              </button>
+
+              <button
+                onClick={() => navigate('/trip-planner-4')}
+                className="w-full mt-4 py-2 text-gray-400 text-xs font-semibold hover:text-gray-600 flex items-center justify-center gap-1"
+              >
+                <FaChevronLeft size={10} /> Edit Itinerary
               </button>
             </div>
           </div>
-        </aside>
+        </div>
       </main>
-      <Footer/>
+
+      <Footer />
     </div>
   );
 }
