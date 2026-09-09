@@ -12,8 +12,8 @@ const bookingSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['hotel', 'flight', 'activity', 'package'],
-    required: true,
+    enum: ['hotel', 'flight', 'activity', 'package', 'trip'],
+    default: 'package',
   },
   title: {
     type: String,
@@ -33,14 +33,29 @@ const bookingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  amount: {
+    type: Number,
+  },
   currency: {
     type: String,
-    default: 'USD',
+    default: 'INR',
   },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-    default: 'pending',
+    default: 'confirmed',
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['Pending', 'Paid', 'Failed', 'Refunded'],
+    default: 'Paid',
+  },
+  paymentMethod: {
+    type: String,
+    default: 'Card',
+  },
+  paymentResponse: {
+    type: mongoose.Schema.Types.Mixed,
   },
   bookingReference: {
     type: String,
@@ -61,8 +76,11 @@ const bookingSchema = new mongoose.Schema({
 
 bookingSchema.pre('save', function(next) {
   this.updatedAt = new Date();
+  if (!this.amount && this.price) {
+    this.amount = this.price;
+  }
   if (!this.bookingReference) {
-    this.bookingReference = 'BK' + Date.now() + Math.random().toString(36).substr(2, 9);
+    this.bookingReference = 'TS-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
   }
   next();
 });
