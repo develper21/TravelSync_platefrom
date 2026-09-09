@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaCheckCircle, FaPaperPlane } from 'react-icons/fa';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import Card, { CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import api from '../../services/api';
 
-const Contact = () => {
+export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,6 +15,8 @@ const Contact = () => {
     message: '',
   });
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -24,186 +28,167 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSuccessMessage('');
+    setErrorMessage('');
 
-    setTimeout(() => {
-      alert('Thank you for your message! We will get back to you soon.');
+    try {
+      const res = await api.post('/contact', formData);
+      setSuccessMessage(res.data.message || 'Thank you! Your message has been sent successfully.');
       setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      setErrorMessage(err.response?.data?.error || 'Failed to send message. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const contactInfo = [
     {
       icon: <FaPhone className="text-blue-600 text-xl" />,
-      title: 'Phone',
+      title: 'Phone Support',
       content: '+1 (555) 123-4567',
-      description: 'Call us for immediate assistance',
+      description: 'Call us for immediate booking or trip assistance',
     },
     {
       icon: <FaEnvelope className="text-green-600 text-xl" />,
-      title: 'Email',
+      title: 'Email Us',
       content: 'support@travelsync.com',
-      description: 'Send us an email anytime',
+      description: 'We typically respond within 2-4 business hours',
     },
     {
       icon: <FaMapMarkerAlt className="text-orange-600 text-xl" />,
-      title: 'Office',
-      content: '123 Travel Street, Adventure City',
-      description: 'Visit our headquarters',
+      title: 'Global Headquarters',
+      content: '123 Travel Boulevard, Suite 400',
+      description: 'San Francisco, CA 94105',
     },
     {
       icon: <FaClock className="text-purple-600 text-xl" />,
-      title: 'Hours',
-      content: 'Mon-Fri: 9AM-6PM, Sat: 10AM-4PM',
-      description: 'Our business hours',
+      title: 'Operating Hours',
+      content: 'Mon-Fri: 9AM - 7PM (EST)',
+      description: 'Weekend emergency concierge on-call 24/7',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-between">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Contact Us
+          <span className="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full">
+            We're Here For You
+          </span>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mt-3 mb-4">
+            Get in Touch with TravelSync
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have a question about your trip? Need help with booking? We're here to help you
-            every step of your journey.
+            Have a question about sustainable destinations, your trip planner, or enterprise partnerships? Drop us a note!
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Get in Touch
-            </h2>
-
-            <div className="space-y-6">
-              {contactInfo.map((info, index) => (
-                <div key={index} className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    {info.icon}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Contact Details Cards */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Channels</h3>
+              <div className="space-y-6">
+                {contactInfo.map((info, index) => (
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div className="p-3 bg-white rounded-xl shadow-xs flex-shrink-0">
+                      {info.icon}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-base">{info.title}</h4>
+                      <p className="text-blue-600 font-semibold text-sm mt-0.5">{info.content}</p>
+                      <p className="text-gray-500 text-xs mt-1">{info.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {info.title}
-                    </h3>
-                    <p className="text-blue-600 font-medium">
-                      {info.content}
-                    </p>
-                    <p className="text-gray-600 text-sm">
-                      {info.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* FAQ Section */}
-            <div className="mt-8 p-6 bg-blue-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Frequently Asked Questions
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <p className="font-medium text-gray-900">How quickly do you respond?</p>
-                  <p className="text-gray-600">We typically respond within 2-4 hours during business hours.</p>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Do you offer 24/7 support?</p>
-                  <p className="text-gray-600">Yes, our emergency support line is available 24/7 for urgent travel issues.</p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div>
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Send us a Message
-              </h2>
+          <div className="lg:col-span-7">
+            <Card className="rounded-3xl shadow-sm border border-gray-100">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="text-2xl font-bold text-gray-900">Send us a Message</CardTitle>
+                <p className="text-gray-500 text-sm mt-1">Our travel advisory team will get back to you promptly.</p>
+              </CardHeader>
+              <CardContent className="p-8 pt-4">
+                {successMessage && (
+                  <div className="mb-6 bg-green-50 border border-green-200 text-green-800 p-4 rounded-2xl flex items-center gap-3">
+                    <FaCheckCircle className="text-green-600 text-xl flex-shrink-0" />
+                    <div>
+                      <p className="font-bold">Message Received!</p>
+                      <p className="text-sm">{successMessage}</p>
+                    </div>
+                  </div>
+                )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {errorMessage && (
+                  <div className="mb-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl text-sm font-semibold">
+                    {errorMessage}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      label="Your Name *"
+                      name="name"
+                      placeholder="e.g. Maya Lin"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Input
+                      label="Email Address *"
+                      name="email"
+                      type="email"
+                      placeholder="e.g. maya@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
                   <Input
-                    label="Full Name"
-                    name="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={formData.name}
+                    label="Subject"
+                    name="subject"
+                    placeholder="e.g. Custom Trip Planning Query"
+                    value={formData.subject}
                     onChange={handleChange}
-                    required
                   />
 
-                  <Input
-                    label="Email Address"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Your Message *
+                    </label>
+                    <textarea
+                      name="message"
+                      rows={5}
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Tell us about your upcoming travel plans, questions, or feedback..."
+                      className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-800 text-sm"
+                      required
+                    />
+                  </div>
 
-                <Input
-                  label="Subject"
-                  name="subject"
-                  type="text"
-                  placeholder="What's this about?"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                />
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Message <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={6}
-                    placeholder="Tell us more about your inquiry..."
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  loading={loading}
-                  className="w-full"
-                  size="lg"
-                >
-                  {loading ? 'Sending...' : 'Send Message'}
-                </Button>
-              </form>
-            </div>
+                  <Button type="submit" size="lg" disabled={loading} className="w-full font-bold shadow-md">
+                    <FaPaperPlane className="mr-2" />
+                    {loading ? 'Sending Message...' : 'Submit Inquiry'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        {/* Map Section (Placeholder) */}
-        <div className="mt-16">
-          <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
-            <div className="text-center">
-              <FaMapMarkerAlt className="text-4xl text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Interactive map would go here</p>
-              <p className="text-sm text-gray-500">123 Travel Street, Adventure City</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      </main>
 
       <Footer />
     </div>
   );
-};
-
-export default Contact;
+}
