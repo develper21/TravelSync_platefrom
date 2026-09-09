@@ -1,10 +1,11 @@
 import Payment from '../models/Payment.js';
+import Booking from '../models/Booking.js';
 
 export const getUserPayments = async (req, res) => {
   try {
     const payments = await Payment.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
-      .populate('bookingId', 'title location')
+      .populate('bookingId')
       .populate('tripId', 'title destination');
     res.json(payments);
   } catch (error) {
@@ -17,7 +18,7 @@ export const getPayment = async (req, res) => {
     const payment = await Payment.findOne({
       _id: req.params.id,
       userId: req.user.id
-    }).populate('bookingId', 'title location')
+    }).populate('bookingId')
       .populate('tripId', 'title destination');
 
     if (!payment) {
@@ -32,24 +33,24 @@ export const getPayment = async (req, res) => {
 
 export const createPayment = async (req, res) => {
   try {
+    const txnId = 'TXN_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     const paymentData = {
       ...req.body,
       userId: req.user.id,
-      status: 'pending',
+      transactionId: txnId,
+      status: req.body.status || 'completed',
     };
 
     const payment = new Payment(paymentData);
-
-    setTimeout(async () => {
-      try {
-        payment.status = 'completed';
-        await payment.save();
-      } catch (error) {
-        console.error('Payment processing error:', error);
-      }
-    }, 2000);
-
     await payment.save();
+
+    // If linked to a booking, update booking status to confirmed
+    if (payment.bookingId) {
+      await Booking.findByIdAndUpdate(payment.bookingId, {
+        paymentStatus: 'Paid',
+        status: 'confirmed'
+      });
+    }
 
     res.status(201).json(payment);
   } catch (error) {
@@ -69,6 +70,13 @@ export const processPayment = async (req, res) => {
 
     if (!payment) {
       return res.status(404).json({ error: 'Payment not found' });
+    }
+
+    if (status === 'completed' && payment.bookingId) {
+      await Booking.findByIdAndUpdate(payment.bookingId, {
+        paymentStatus: 'Paid',
+        status: 'confirmed'
+      });
     }
 
     res.json(payment);
@@ -104,17 +112,8 @@ export const getPaymentStats = async (req, res) => {
               ]
             }
           },
-          failedPayments: {
-            $sum: {
-              $cond: [
-                { $eq: ['$status', 'failed'] },
-                1,
-                0
-              ]
-            }
-          }
-        }
-      }
+        },
+      },
     ]);
 
     res.json(stats[0] || {
@@ -122,9 +121,19 @@ export const getPaymentStats = async (req, res) => {
       totalAmount: 0,
       completedPayments: 0,
       pendingPayments: 0,
-      failedPayments: 0,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const paymentWebhook = async (req, res) => {
+  try {
+    // Webhook receiver for payment gateways (Stripe / Razorpay)
+    const event = req.body;
+    console.log('Payment Webhook received event:', event?.type || 'sandbox_event');
+    res.status(200).json({ received: true });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
