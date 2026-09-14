@@ -1,24 +1,23 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import Home from './pages/public/Home';
-import About from './pages/public/About';
-import Contact from './pages/public/Contact';
-import Blog from './pages/public/Blog';
-import BlogDetail from './pages/public/BlogDetail';
-import SignIn from './pages/auth/SignIn';
-import SignUp from './pages/auth/SignUp';
-import Profile from './pages/dashboard/Profile';
-import Payment from './pages/dashboard/Payment';
-import TripStep1 from './pages/trips/step1';
-import TripStep2 from './pages/trips/step2';
-import TripStep3 from './pages/trips/step3';
-import TripStep4 from './pages/trips/step4';
-import TripStep5 from './pages/trips/step5';
-import TripStep6 from './pages/trips/step6';
-import Explore from './pages/bookings/Explore';
-import DestinationDetail from './pages/bookings/DestinationDetail';
-import ProtectedRoute from './components/common/ProtectedRoute';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Home from "./pages/public/Home";
+import About from "./pages/public/About";
+import Contact from "./pages/public/Contact";
+import Blog from "./pages/public/Blog";
+import BlogDetail from "./pages/public/BlogDetail";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import Profile from "./pages/dashboard/Profile";
+import Payment from "./pages/dashboard/Payment";
+import TripStep1 from "./pages/trips/step1";
+import TripStep2 from "./pages/trips/step2";
+import TripStep3 from "./pages/trips/step3";
+import TripStep4 from "./pages/trips/step4";
+import TripStep5 from "./pages/trips/step5";
+import TripStep6 from "./pages/trips/step6";
+import Explore from "./pages/bookings/Explore";
+import DestinationDetail from "./pages/bookings/DestinationDetail";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
   return (
