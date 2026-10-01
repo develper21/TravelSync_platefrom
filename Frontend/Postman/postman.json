@@ -1,0 +1,929 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-0002-4000-8000-000000000002",
+    "name": "TravelSync Frontend API",
+    "description": "TravelSync Frontend API collection — frontend app jo requests bhejta hai wahi sab yahan cover hai.\n\n## Import\nPostman → Import → select this file.\n\n## Setup\n1. Backend start karo: `cd server && npm run dev`\n2. Frontend bhi start karo: `cd Frontend && npm run dev` (optional — parallel testing ke liye)\n3. **1. Auth Flow → Sign In** chalao — token auto-save ho jayega, baaki requests `{{token}}` use karengi.\n\n## Ordering\nFolders user journey ke order me hain — upar se neeche chalao to poora frontend flow test ho jayega:\nAuth → Profile → Discover → Trip Planning → Bookings & Payments → Engagement.\n\n## Base URL\n`http://localhost:5000/api` — frontend ka `src/services/api.js` bhi yahi use karta hai. Deployed API pe test karna ho to `apiBaseUrl` variable change kar do.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "apiBaseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "tripId", "value": "" },
+    { "key": "bookingId", "value": "" },
+    { "key": "paymentId", "value": "" },
+    { "key": "destinationId", "value": "" },
+    { "key": "blogId", "value": "" },
+    { "key": "hotelId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Auth Flow",
+      "description": "User journey ka start — signup/signin karo, token apne aap save hoga.",
+      "item": [
+        {
+          "name": "Signup New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('token', res.token);",
+                  "    pm.collectionVariables.set('userId', res.user ? res.user._id : '');",
+                  "    console.log('Signup done — token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Frontend Tester\",\n  \"email\": \"frontend.test@example.com\",\n  \"password\": \"test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/auth/signup",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "SignUp page yahi call karta hai. Response me token + 2FA QR code."
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In (existing user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (pm.response.code === 200 && res.token) {",
+                  "    pm.collectionVariables.set('token', res.token);",
+                  "    pm.collectionVariables.set('userId', res.user ? res.user._id : '');",
+                  "    console.log('Signed in as:', res.user ? res.user.email : 'unknown');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"frontend.test@example.com\",\n  \"password\": \"test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/auth/signin",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["auth", "signin"]
+            },
+            "description": "SignIn page yahi call karta hai (localStorage me token save hota hai — yahan collection variable me)."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify 2FA OTP",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"frontend.test@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/auth/verify-otp",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["auth", "verify-otp"]
+            },
+            "description": "2FA verification. OTP authenticator app se lo (signup me qrCode scan karke)."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"test123456\",\n  \"newPassword\": \"newpass123\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/auth/password",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["auth", "password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/auth/logout",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Profile & Settings",
+      "description": "Profile page aur settings — user details, preferences, payment methods.",
+      "item": [
+        {
+          "name": "Load Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/profile",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Frontend Tester Updated\",\n  \"phone\": \"+919876543210\",\n  \"country\": \"India\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/profile",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load Preferences",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/preferences",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "preferences"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailNotifications\": true,\n  \"tripReminders\": true,\n  \"ecoFriendlySuggestions\": true,\n  \"language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/preferences",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "preferences"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Payment Method",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const methods = res.paymentMethods || (res.user && res.user.paymentMethods) || (Array.isArray(res) ? res : []);",
+                  "if (res._id) {",
+                  "    pm.collectionVariables.set('paymentMethodId', res._id);",
+                  "} else if (methods.length) {",
+                  "    pm.collectionVariables.set('paymentMethodId', methods[methods.length - 1]._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardType\": \"Visa\",\n  \"last4\": \"4242\",\n  \"expiry\": \"12/28\",\n  \"cardHolderName\": \"Frontend Tester\",\n  \"billingAddress\": \"123 MG Road, Bangalore\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/payment-methods",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "payment-methods"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Payment Method",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/payment-methods/{{paymentMethodId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "payment-methods", "{{paymentMethodId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/profile",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "⚠️ Account delete — sabse last me chalao, token invalidate ho jayega."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Discover (Public Pages)",
+      "description": "Home/Destinations/Hotels/Blogs pages — ye sab public hai, token ki zarurat nahi.",
+      "item": [
+        {
+          "name": "Browse Destinations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const list = Array.isArray(res) ? res : (res.destinations || []);",
+                  "if (list.length) pm.collectionVariables.set('destinationId', list[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/destinations?search=&tag=&page=1&limit=12",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["destinations"],
+              "query": [
+                { "key": "search", "value": "" },
+                { "key": "tag", "value": "" },
+                { "key": "ecoFriendly", "value": "true", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Destination Details",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/destinations/{{destinationId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["destinations", "{{destinationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Browse Hotels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const list = Array.isArray(res) ? res : (res.hotels || []);",
+                  "if (list.length) pm.collectionVariables.set('hotelId', list[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/hotels?limit=20",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["hotels"],
+              "query": [
+                { "key": "limit", "value": "20" },
+                { "key": "skip", "value": "0", "disabled": true },
+                { "key": "city", "value": "Goa", "disabled": true },
+                { "key": "country", "value": "India", "disabled": true },
+                { "key": "minRating", "value": "4", "disabled": true },
+                { "key": "maxPrice", "value": "10000", "disabled": true },
+                { "key": "amenities", "value": "wifi,pool", "disabled": true },
+                { "key": "ecoFriendly", "value": "true", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Hotels",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/hotels/search?q=beach",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["hotels", "search"],
+              "query": [
+                { "key": "q", "value": "beach" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hotel Details",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/hotels/{{hotelId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["hotels", "{{hotelId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eco-Friendly Hotels",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/hotels/eco-friendly",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["hotels", "eco-friendly"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Browse Blogs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const list = Array.isArray(res) ? res : (res.blogs || []);",
+                  "if (list.length) pm.collectionVariables.set('blogId', list[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/blogs?page=1&limit=9",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["blogs"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "tag", "value": "", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "9" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Blog Details",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/blogs/{{blogId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["blogs", "{{blogId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Trip Planning",
+      "description": "Plan Trip page — trips create/update/delete, dashboard stats.",
+      "item": [
+        {
+          "name": "Load Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips/stats",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load My Trips",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (pm.response.code === 200 && Array.isArray(res) && res.length) {",
+                  "    pm.collectionVariables.set('tripId', res[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plan New Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (pm.response.code === 201 && res._id) {",
+                  "    pm.collectionVariables.set('tripId', res._id);",
+                  "    console.log('Trip planned:', res.title);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Manali Trip Plan\",\n  \"destination\": \"Manali, India\",\n  \"startDate\": \"2026-12-10\",\n  \"endDate\": \"2026-12-15\",\n  \"travelers\": 4,\n  \"budget\": 40000,\n  \"notes\": \"Family trip\",\n  \"status\": \"planning\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plan Trip (PDF endpoint /api/trip/plan)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Goa Trip Plan\",\n  \"destination\": \"Goa, India\",\n  \"startDate\": \"2026-11-01\",\n  \"endDate\": \"2026-11-07\",\n  \"travelers\": 2,\n  \"budget\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/trip/plan",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trip", "plan"]
+            },
+            "description": "Trip planner PDF page isi ko call karta hai — same handler as POST /trips."
+          },
+          "response": []
+        },
+        {
+          "name": "Trip Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips/{{tripId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips", "{{tripId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Trip",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\",\n  \"budget\": 45000\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips/{{tripId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips", "{{tripId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/trips/{{tripId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["trips", "{{tripId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Bookings & Payments",
+      "description": "Checkout flow — booking create karo, payment process karo, history dekho.",
+      "item": [
+        {
+          "name": "Load Booking Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings/stats",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (pm.response.code === 201 && res._id) {",
+                  "    pm.collectionVariables.set('bookingId', res._id);",
+                  "    console.log('Booking created:', res.bookingReference);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"type\": \"hotel\",\n  \"title\": \"Beach Resort Goa\",\n  \"location\": \"Goa, India\",\n  \"checkInDate\": \"2026-11-01\",\n  \"checkOutDate\": \"2026-11-07\",\n  \"price\": 25000,\n  \"currency\": \"INR\",\n  \"status\": \"confirmed\",\n  \"paymentStatus\": \"Paid\",\n  \"paymentMethod\": \"Card\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Booking Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings/{{bookingId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings", "{{bookingId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings/{{bookingId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings", "{{bookingId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const pay = res.payment || res;",
+                  "if (pm.response.code < 300 && pay._id) {",
+                  "    pm.collectionVariables.set('paymentId', pay._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"tripId\": \"{{tripId}}\",\n  \"amount\": 25000,\n  \"currency\": \"INR\",\n  \"paymentMethod\": \"card\",\n  \"status\": \"completed\",\n  \"description\": \"Hotel booking payment\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/payments",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Process Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentId\": \"{{paymentId}}\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/payments/process",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["payments", "process"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load Payment History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/payments",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load Payment Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/payments/stats",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["payments", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/bookings/{{bookingId}}/cancel",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["bookings", "{{bookingId}}", "cancel"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Engagement",
+      "description": "Reviews, comments, saved destinations, contact form — logged-in user ke actions.",
+      "item": [
+        {
+          "name": "Save Destination",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/save-destination/{{destinationId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "save-destination", "{{destinationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load Saved Destinations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/saved-destinations",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "saved-destinations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Saved Destination",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/users/remove-destination/{{destinationId}}",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["users", "remove-destination", "{{destinationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Destination Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Amazing experience, would visit again!\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/destinations/{{destinationId}}/review",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["destinations", "{{destinationId}}", "review"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Blog Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Great article! Adding this to my bucket list.\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/blogs/{{blogId}}/comment",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["blogs", "{{blogId}}", "comment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Contact Form",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Frontend Tester\",\n  \"email\": \"frontend.test@example.com\",\n  \"subject\": \"Feedback\",\n  \"message\": \"Great app, keep it up!\"\n}"
+            },
+            "url": {
+              "raw": "{{apiBaseUrl}}/contact",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["contact"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Load Contact Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/contact",
+              "host": ["{{apiBaseUrl}}"],
+              "path": ["contact"]
+            },
+            "description": "Admin-side view — saare messages fetch karo."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
