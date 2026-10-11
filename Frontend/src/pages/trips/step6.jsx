@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FaCheckCircle, FaArrowRight, FaPlaneDeparture, FaTicketAlt, FaCalendarAlt, FaUserFriends } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 
 export default function TripPlanner6() {
   const [bookingDetails, setBookingDetails] = useState(null);
-  const navigate = useNavigate();
-
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem('lastBooking') || 'null');
     setBookingDetails(data);
