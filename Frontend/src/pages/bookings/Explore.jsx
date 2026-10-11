@@ -13,7 +13,7 @@ const categories = ["All", "Beach", "Culture", "Adventure", "Eco-Friendly", "Lux
 
 export default function Explore() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
