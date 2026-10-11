@@ -20,7 +20,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function BlogDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
