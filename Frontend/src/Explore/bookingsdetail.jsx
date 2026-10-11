@@ -102,7 +102,7 @@ const destinations = [
   },
 ];
 
-const bookingsdetail = () => {
+const BookingsDetail = () => {
   const location = useLocation();
   const { place } = location.state || {};
 
@@ -449,4 +449,4 @@ const bookingsdetail = () => {
   );
 };
 
-export default bookingsdetail;
+export default BookingsDetail;
