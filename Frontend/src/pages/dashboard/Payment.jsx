@@ -11,7 +11,6 @@ export default function Payment() {
   const [payments, setPayments] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
   const [savedMethods, setSavedMethods] = useState([]);
-  const [loadingMethods, setLoadingMethods] = useState(true);
 
   const [cardForm, setCardForm] = useState({
     cardHolderName: '',
@@ -41,7 +40,6 @@ export default function Payment() {
   };
 
   const fetchUserMethods = async () => {
-    setLoadingMethods(true);
     try {
       const res = await api.get('/user/profile');
       if (res.data?.user?.paymentMethods) {
@@ -49,8 +47,6 @@ export default function Payment() {
       }
     } catch (err) {
       console.warn('Could not fetch payment methods:', err);
-    } finally {
-      setLoadingMethods(false);
     }
   };
 
@@ -81,7 +77,7 @@ export default function Payment() {
     try {
       const res = await api.delete(`/user/payment-methods/${id}`);
       setSavedMethods(res.data || []);
-    } catch (err) {
+    } catch {
       alert('Failed to remove card.');
     }
   };
