@@ -122,7 +122,7 @@ const Homepage = () => {
       setSubscribedMsg('Thank you for subscribing! Sustainable travel tips are on the way.');
       setNewsletterEmail('');
       setTimeout(() => setSubscribedMsg(''), 5000);
-    } catch (err) {
+    } catch {
       setSubscribedMsg('Thank you for subscribing!');
       setNewsletterEmail('');
       setTimeout(() => setSubscribedMsg(''), 5000);
