@@ -205,13 +205,26 @@ The application is fully responsive and works on:
 
 ## 🧪 Testing
 
-```bash
-# Frontend tests (when implemented)
-npm run test
+CI runs linting, tests, and builds for both projects on pushes and pull requests.
 
-# Backend tests (when implemented)
-npm run test
+```bash
+# Server
+cd server
+npm ci
+npm run lint
+npm test
+npm run build  # Syntax validation (the Node.js server has no compile step)
+
+# Frontend (from the repository root)
+cd ../Frontend
+npm ci
+npm run lint
+npm test
+npm run build
 ```
+
+Server tests cover destination search/detail and contact-message validation/submission.
+Frontend tests cover protected-route redirects and authenticated access.
 
 ## 📚 Documentation
 
