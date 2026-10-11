@@ -23,7 +23,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function DestinationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [destination, setDestination] = useState(null);
   const [loading, setLoading] = useState(true);
