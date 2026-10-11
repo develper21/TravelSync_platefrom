@@ -19,7 +19,6 @@ import hotel4 from "../../assets/images/hotel4.png";
 import hotel5 from "../../assets/images/hotel5.png";
 import hotel6 from "../../assets/images/hotel6.png";
 import plannerAvatar from "../../assets/images/team1.png";
-import heroPlaceholder from "../../assets/images/heroPlaceholder.png";
 
 const HOTELS = [
   {
