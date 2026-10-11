@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
         try {
           setUser(JSON.parse(storedUser));
           // Optionally verify token with backend here
-        } catch (e) {
+        } catch {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         }
@@ -89,4 +89,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
