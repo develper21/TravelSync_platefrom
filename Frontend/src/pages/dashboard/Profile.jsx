@@ -131,7 +131,7 @@ export default function Profile() {
     try {
       await api.delete(`/trips/${id}`);
       setTrips(trips.filter((t) => t._id !== id));
-    } catch (err) {
+    } catch {
       alert('Failed to delete trip.');
     }
   };
@@ -140,7 +140,7 @@ export default function Profile() {
     try {
       await api.delete(`/user/remove-destination/${id}`);
       setSavedDestinations(savedDestinations.filter((d) => d._id !== id));
-    } catch (err) {
+    } catch {
       alert('Failed to remove destination from wishlist.');
     }
   };
